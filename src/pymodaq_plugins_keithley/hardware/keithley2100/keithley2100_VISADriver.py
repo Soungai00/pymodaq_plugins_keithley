@@ -68,20 +68,20 @@ class Keithley2100VISADriver:
         self._instr.write(cmd)
 
 
-# if __name__ == "__main__":
-#     try:
-#         k2110 = Keithley2100VISADriver("K2110")
-#         k2110.reset()
-#         k2110.set_mode('Ohm2')
-#         k2110.set_mode('R4W', range=10, resolution='MAX')
-#         k2110.set_mode('R4W', resolution='MIN')
-#         k2110.set_mode('IAC', range=0.001, resolution='MIN')
-#         k2110.set_mode('vdc', range=0.1, resolution='0.0001')
+if __name__ == "__main__":
+    try:
+        k2110 = Keithley2100VISADriver("K2100")
+        k2110.reset()
+        k2110.set_mode('Ohm2')
+        k2110.set_mode('R4W', range=10, resolution='MAX')
+        k2110.set_mode('R4W', resolution='MIN')
+        k2110.set_mode('IAC', range=0.001, resolution='MIN')
+        k2110.set_mode('vdc', range=0.1, resolution='0.0001')
 
-#         print(k2110.read())
+        print(k2110.read())
 
-#         k2110.close()
+        k2110.close()
 
-#     except Exception as e:
-#         print("Exception ({}): {}".format(type(e), str(e)))
+    except Exception as e:
+        print("Exception ({}): {}".format(type(e), str(e)))
        
