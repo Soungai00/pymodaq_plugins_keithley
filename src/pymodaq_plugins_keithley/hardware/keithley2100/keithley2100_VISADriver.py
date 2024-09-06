@@ -4,14 +4,15 @@ import pyvisa as visa
 
 class Keithley2100VISADriver: 
 
-   def __init__(self, rsrc_name, pyvisa_backend='@ni'):
+   def __init__(self, rsrc_name):
         """
         Parameters
         ----------
         rsrc_name   (string)        VISA Resource name
         pyvisa_backend  (string)    Expects a pyvisa backend identifier or a path to the visa backend dll (ref. to pyvisa)
         """
-        rm = visa.highlevel.ResourceManager(pyvisa_backend)
+        # rm = visa.highlevel.ResourceManager(pyvisa_backend)
+        rm = visa.ResourceManager()
         self._instr = rm.open_resource(rsrc_name)
         self._instr.read_termination = '\n'
         self._instr.write_termination = '\n'
@@ -20,10 +21,10 @@ class Keithley2100VISADriver:
         self._instr.close()
 
    def get_identification(self):
-        self._instr.query("*IDN?")
+        return self._instr.query("*IDN?")
 
    def reset(self):
-        self.write(":STAT:QUEUE:CLEAR;*RST;:STAT:PRES;:*CLS;")
+        self._instr.write(":STAT:QUEUE:CLEAR;*RST;:STAT:PRES;:*CLS;")
 
    def read(self):
         return float(self._instr.query(":READ?"))
@@ -70,7 +71,7 @@ class Keithley2100VISADriver:
 
 if __name__ == "__main__":
     try:
-        k2110 = Keithley2100VISADriver("K2100")
+        k2110 = Keithley2100VISADriver("USB0::0x05E6::0x2100::1149087::INSTR")
         k2110.reset()
         k2110.set_mode('Ohm2')
         k2110.set_mode('R4W', range=10, resolution='MAX')
