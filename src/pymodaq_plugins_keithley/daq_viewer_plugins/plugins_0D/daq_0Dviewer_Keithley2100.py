@@ -3,6 +3,7 @@ from pymodaq.control_modules.viewer_utility_classes import DAQ_Viewer_base, como
 from pymodaq.utils.data import DataFromPlugins
 from easydict import EasyDict as edict
 from collections import OrderedDict
+"""FIX ME: the following import should be fixed to import the Keithley2100 class"""
 from pymodaq_plugins_keithley.hardware.keithley2100.keithley2100_VISADriver import Keithley2100VISADriver as Keithley2100
 
 
