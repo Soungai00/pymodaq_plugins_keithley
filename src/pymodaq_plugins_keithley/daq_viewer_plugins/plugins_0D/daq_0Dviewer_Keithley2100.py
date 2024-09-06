@@ -9,7 +9,7 @@ from pymodaq_plugins_keithley.hardware.keithley2100.keithley2100_VISADriver impo
 
 class DAQ_0DViewer_Keithley2100(DAQ_Viewer_base):
     """
-        Naive implementation of a DAQ 0D Viewer using the Keithley 2110 as data source
+        Naive implementation of a DAQ 0D Viewer using the Keithley 2100 as data source
         This DAQ0D Viewer plugin only supports measurement mode selection and a simple data read acquisition mechanism
         with no averaging supported
         =============== =================
@@ -94,7 +94,7 @@ class DAQ_0DViewer_Keithley2100(DAQ_Viewer_base):
 
         """
         data = self.controller.read()
-        self.data_grabed_signal.emit([utils.DataFromPlugins(name='K2110', data=[[data]], dim='Data0D',)])
+        self.data_grabed_signal.emit([utils.DataFromPlugins(name='K2100', data=[[data]], dim='Data0D',)])
         self.ind_data += 1
 
     def stop(self):
