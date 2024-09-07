@@ -304,10 +304,6 @@ class Keithley2100VISADriver:
                     self._instr.write("ROUT:SCAN:LSEL INT")
                 
             return channels
-        
-    # def stop_acquisition(self):
-    #     # If scan in process, stop it
-    #     self._instr.write("ROUT:SCAN:LSEL NONE")
 
     #TODO:See if this is applicable to the Keithley 2100
     def user_command(self):
