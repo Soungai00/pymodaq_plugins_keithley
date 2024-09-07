@@ -1,118 +1,4 @@
 # daq_0Dviewer_Keithley2100 - 0D data viewer for Keithley 2100 multimeter 
-from pymodaq.control_modules.viewer_utility_classes import DAQ_Viewer_base, comon_parameters
-from pymodaq.utils.data import DataFromPlugins
-from easydict import EasyDict as edict
-from collections import OrderedDict
-from pymodaq_plugins_keithley.hardware.keithley2100.keithley2100_VISADriver import Keithley2100VISADriver as Keithley2100
-from pymodaq.utils.logger import set_logger, get_module_name
-logger = set_logger(get_module_name(__file__))
-
-
-class DAQ_0DViewer_Keithley2100(DAQ_Viewer_base):
-    """
-        Naive implementation of a DAQ 0D Viewer using the Keithley 2100 as data source
-        This DAQ0D Viewer plugin only supports measurement mode selection and a simple data read acquisition mechanism
-        with no averaging supported
-        =============== =================
-        **Attributes**  **Type**
-        *params*        dictionnary list
-        *x_axis*        1D numpy array
-        *ind_data*      int
-        =============== =================
-    """
-    params = comon_parameters+[
-        {'title': 'Keithley2100 Parameters',  'name': 'K2100Params', 'type': 'group', 'children': [
-            {'title': 'Mode', 'name': 'mode', 'type': 'list', 'limits': ['VDC', 'VAC', 'R2W', 'R4W'], 'value': 'VDC'}
-
-        ]}
-    ]
-
-    def __init__(self, parent=None, params_state=None): # init_params is a list of tuple where each tuple contains info on a 1D channel (Ntps,amplitude, width, position and noise)
-        super(DAQ_0DViewer_Keithley2100, self).__init__(parent, params_state)
-        self.x_axis = None
-        self.ind_data = 0
-
-    def ini_attributes(self):
-        """Attributes init when DAQ_0DViewer_Keithley class is instanced"""
-        self.controller: Keithley2100 = None
-        self.channels_in_selected_mode = None
-        self.rsrc_name = None
-        self.panel = None
-        self.instr = None
-
-
-
-    def commit_settings(self, param):
-        """
-            ============== ========= =================
-            **Parameters**  **Type**  **Description**
-            *param*        child node  could be the following setting parameter: 'mode'
-            ============== ========= =================
-        """
-        if param.name() == 'mode':
-            """Updates the newly selected measurement mode"""
-            self.controller.set_mode(param.value())
-
-    def ini_detector(self, controller=None):
-        """
-            Initialisation procedure of the detector.
-
-            Returns
-            -------
-                the initialized status.
-        """
-
-        self.status.update(edict(initialized=False, info="", x_axis=None, y_axis=None, controller=None))
-        if self.settings.child(('controller_status')).value() == "Slave":
-            if controller is None: 
-                raise Exception('no controller has been defined externally while this detector is a slave one')
-            else:
-                self.controller = controller
-        else:
-            try:
-                self.controller = Keithley2100('K2100')
-            except Exception as e:
-                raise Exception('No controller could be defined because an error occurred\
-                 while connecting to the instrument. Error: {}'.format(str(e)))
-
-        self.controller.set_mode(self.settings.child('K2100Params', 'mode').value())
-
-        # initialize viewers with the future type of data
-        self.data_grabed_signal.emit([DataFromPlugins(name='Keithley2100', data=[0], dim='Data0D', labels=['Meas', 'Time'])])
-
-        self.status.initialized = True
-        self.status.controller = self.controller
-        return self.status
-
-    def close(self):
-        """Terminate the communication protocol"""
-        self.controller.close()
-        logger.info("communication ended successfully")
-
-    def grab_data(self, Naverage=1, **kwargs):
-        """
-            | Start new acquisition.
-            |
-            |
-            | Send the data_grabed_signal once done.
-
-            =============== ======== ===============================================
-            **Parameters**  **Type**  **Description**
-            *Naverage*      int       specify the threshold of the mean calculation
-            =============== ======== ===============================================
-
-        """
-        data = self.controller.read()
-        self.data_grabed_signal.emit([utils.DataFromPlugins(name='K2100', data=[[data]], dim='Data0D',)])
-        self.ind_data += 1
-
-    def stop(self):
-        """
-            not implemented.
-        """
-
-        return ""
-
 import numpy as np
 from pymodaq.utils.daq_utils import ThreadCommand
 from pymodaq.utils.data import DataFromPlugins, DataToExport
@@ -289,15 +175,58 @@ class DAQ_0DViewer_Keithley2100(DAQ_Viewer_base):
         :param kwargs: others optionals arguments
         :type kwargs: dict
         """
+        # # ACQUISITION OF DATA
+        # #TODO: Check on data acquisition from front and rear panel.
+        # if self.panel == 'FRONT':
+        #     data_tot = self.controller.data()
+        # elif self.panel == 'REAR':
+        #     data_tot = self.controller.data()
+        # self.emit(data_tot)
+
+        # FIXME: this was just restored from daq_0Dviewer_Keithley27xx.py. If this does now work, use self.emit as above.
         # ACQUISITION OF DATA
-        #TODO: Check on data acquisition from front and rear panel. 
         if self.panel == 'FRONT':
             data_tot = self.controller.data()
+            data_measurement = data_tot[1]
         elif self.panel == 'REAR':
+            channels_in_selected_mode = self.channels_in_selected_mode[1:-1].replace('@', '')
+            chan_to_plot = []
             data_tot = self.controller.data()
-      
-       
-        self.emit(data_tot)
+            data_measurement = data_tot[1]
+            for i in range(len(channels_in_selected_mode.split(','))):
+                chan_to_plot.append('Channel ' + str(channels_in_selected_mode.split(',')[i]))
+            # Affect each value to the corresponding channel
+            dict_chan_value = dict(zip(channels_in_selected_mode.split(','), data_measurement))
+        # Dictionary linking channel's modes to physical quantities
+        dict_label_mode = {'VOLT:DC': 'Voltage', 'VOLT:AC': 'Voltage', 'CURR:DC': 'Current', 'CURR:AC': 'Current',
+                           'RES': 'Resistance', 'FRES': 'Resistance', 'FREQ': 'Frequency', 'TEMP': 'Temperature'}
+        # EMISSION OF DATA
+        # When reading the scan_list, data are displayed and exported grouped by mode
+        if not self.controller.reading_scan_list:
+            label = dict_label_mode[self.controller.current_mode]
+            if self.panel == 'FRONT':
+                labels = 'Front input'
+            elif self.panel == 'REAR':
+                labels = [chan_to_plot[i] for i in range(len(chan_to_plot))]
+            dte = DataToExport(name='keithley',
+                               data=[DataFromPlugins(name=label,
+                                                     data=[np.array([data_measurement[i]]) for i in
+                                                           range(len(data_measurement))],
+                                                     dim='Data0D',
+                                                     labels=labels)])
+
+        # Reading only channels configured in the selected mode
+        elif self.controller.reading_scan_list:
+            dte = DataToExport(name='keithley',
+                               data=[DataFromPlugins(name=dict_label_mode[key],
+                                                     data=[np.array([dict_chan_value[str(chan)]]) for chan in
+                                                           self.controller.modes_channels_dict.get(key)],
+                                                     dim='Data0D',
+                                                     labels=['Channel ' + str(chan) for chan in
+                                                             self.controller.modes_channels_dict.get(key)]
+                                                     ) for key in self.controller.modes_channels_dict.keys() if
+                                     self.controller.modes_channels_dict.get(key) != []])
+        self.dte_signal.emit(dte)
 
     def stop(self):
         """Stop the current grab hardware wise if necessary"""
