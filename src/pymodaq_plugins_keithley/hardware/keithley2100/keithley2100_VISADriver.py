@@ -193,17 +193,6 @@ class Keithley2100VISADriver:
         self.channels_scan_list = channels[:-1]
         logger.info("       ********** CONFIGURATION SEQUENCE SUCCESSFULLY ENDED **********")
 
-    # def clear_buffer(self):
-    #     # Default: auto clear when scan start
-    #     self._instr.write("TRAC:CLE")
-
-    # def clear_buffer_off(self):
-    #     # Disable buffer auto clear
-    #     self._instr.write("TRAC:CLE:AUTO OFF")
-
-    # def clear_buffer_on(self):
-    #     # Disable buffer auto clear
-    #     self._instr.write("TRAC:CLE:AUTO ON")
 
     def close(self):
         # self._instr.write("ROUT:OPEN:ALL")
