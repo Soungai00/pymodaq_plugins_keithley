@@ -28,7 +28,8 @@ class Keithley2100VISADriver:
                            'CURR:AC': [],
                            'RES': [],
                            'FRES': [],
-                           'FREQ': []}
+                           'FREQ': [],
+                           'TEMP': []}
     sample_count_1 = False
     reading_scan_list = False
     current_mode = ''
@@ -164,6 +165,20 @@ class Keithley2100VISADriver:
                 if 'nplc' in config["Keithley", "2100", self.instr, module, 'CHANNELS', key].keys():
                     nplc = config["Keithley", "2100", self.instr, module, 'CHANNELS', key, "nplc"]
                     self._instr.write(mode + ':NPLC ' + str(nplc))
+                
+                if "TEMP" in mode:
+                    transducer = config["Keithley", "27XX", self.instr, module, 'CHANNELS', key, "transducer"].upper()
+                    if "TC" in transducer:
+                        tc_type = config["Keithley", "27XX", self.instr, module, 'CHANNELS', key, "type"].upper()
+                        ref_junc = config["Keithley", "27XX", self.instr, module, 'CHANNELS', key, "ref_junc"].upper()
+                        self.mode_temp_tc(channel, transducer, tc_type, ref_junc)
+                    elif "THER" in transducer:
+                        ther_type = config["Keithley", "27XX", self.instr, module, 'CHANNELS', key, "type"].upper()
+                        self.mode_temp_ther(channel, transducer, ther_type)
+                    elif "FRTD" in transducer:
+                        frtd_type = config["Keithley", "27XX", self.instr, module, 'CHANNELS', key, "type"].upper()
+                        self.mode_temp_frtd(channel, transducer, frtd_type)
+
 
                 # Console info
                 logger.info("Channels {} \n {}".format(key,
@@ -213,6 +228,19 @@ class Keithley2100VISADriver:
     def init_cont_on(self):
         # Enable continuous initiation
         self._instr.write("INIT:CONT ON")
+
+    def mode_temp_frtd(self, channel, transducer, frtd_type,):
+        self._instr.write("TEMP:TRAN " + transducer + "," + channel)
+        self._instr.write("TEMP:FRTD:TYPE " + frtd_type + "," + channel)
+
+    def mode_temp_tc(self, channel, transducer, tc_type, ref_junc,):
+        self._instr.write("TEMP:TRAN " + transducer + "," + channel)
+        self._instr.write("TEMP:TC:TYPE " + tc_type + "," + channel)
+        self._instr.write("TEMP:RJUN:RSEL " + ref_junc + "," + channel)
+
+    def mode_temp_ther(self, channel, transducer, ther_type,):
+        self._instr.write("TEMP:TRAN " + transducer + "," + channel)
+        self._instr.write("TEMP:THER:TYPE " + ther_type + "," + channel)
     
     def reset(self):
         """Resets the Keithley to its default state. 
