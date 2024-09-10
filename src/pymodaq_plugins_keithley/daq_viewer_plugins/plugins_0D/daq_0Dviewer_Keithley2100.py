@@ -4,18 +4,18 @@ from pymodaq.utils.data import DataFromPlugins, DataToExport
 from pymodaq.control_modules.viewer_utility_classes import DAQ_Viewer_base, comon_parameters, main
 from pymodaq.utils.parameter import Parameter
 from pymodaq_plugins_keithley import config
-from pymodaq_plugins_keithley.hardware.keithley27XX.keithley27XX_VISADriver import Keithley27XXVISADriver as Keithley
+from pymodaq_plugins_keithley.hardware.keithley2100.keithley2100_VISADriver import Keithley2100VISADriver as Keithley
 from pymodaq.utils.logger import set_logger, get_module_name
 logger = set_logger(get_module_name(__file__))
 
 
-class DAQ_0DViewer_Keithley27XX(DAQ_Viewer_base):
+class DAQ_0DViewer_Keithley2100(DAQ_Viewer_base):
     """ Keithley plugin class for a OD viewer.
 
     This object inherits all functionalities to communicate with PyMoDAQ’s DAQ_Viewer module through inheritance via
-    DAQ_Viewer_base. It makes a bridge between the DAQ_Viewer module and the keithley27XX_VISADriver.
+    DAQ_Viewer_base. It makes a bridge between the DAQ_Viewer module and the keithley2100_VISADriver.
 
-    :param controller: The particular object that allow the communication with the keithley27XX_VISADriver.
+    :param controller: The particular object that allow the communication with the keithley2100_VISADriver.
     :type  controller:  object
 
     :param params: Parameters displayed in the daq_viewer interface
@@ -28,9 +28,9 @@ class DAQ_0DViewer_Keithley27XX(DAQ_Viewer_base):
     resources_list = []
     
     # Read configuration file
-    for instr in config["Keithley", "27XX"].keys():
+    for instr in config["Keithley", "2100"].keys():
         if "INSTRUMENT" in instr:
-            resources_list += [config["Keithley", "27XX", instr, "rsrc_name"]]
+            resources_list += [config["Keithley", "2100", instr, "rsrc_name"]]
     logger.info("resources list = {}" .format(resources_list))
 
     params = comon_parameters + [
@@ -118,11 +118,11 @@ class DAQ_0DViewer_Keithley27XX(DAQ_Viewer_base):
         else:
             try:
                 # Select the resource to connect with and load the dedicated configuration
-                for instr in config["Keithley", "27XX"]:
+                for instr in config["Keithley", "2100"]:
                     if "INSTRUMENT" in instr:
-                        if config["Keithley", "27XX", instr, "rsrc_name"] == self.settings["resources"]:
-                            self.rsrc_name = config["Keithley", "27XX", instr, "rsrc_name"]
-                            self.panel = config["Keithley", "27XX", instr, "panel"].upper()
+                        if config["Keithley", "2100", instr, "rsrc_name"] == self.settings["resources"]:
+                            self.rsrc_name = config["Keithley", "2100", instr, "rsrc_name"]
+                            self.panel = config["Keithley", "2100", instr, "panel"].upper()
                             self.instr = instr
                             logger.info("Panel configuration 0D_viewer: {}" .format(self.panel))
                 assert self.rsrc_name is not None, "rsrc_name"

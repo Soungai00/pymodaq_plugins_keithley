@@ -10,7 +10,7 @@ class Keithley2100VISADriver:
 
     This class relies on pyvisa module to communicate with the instrument via VISA protocol.
     Please refer to the instrument reference manual available at:
-    FIXME{PLACEHOLDER}
+    FIXME{placeholder}
     """
     # List the Keithley instruments the user has configured from the .toml configuration file
     list_instruments = {}
@@ -65,7 +65,7 @@ class Keithley2100VISADriver:
             self._instr.timeout = 10000
             # Check if the selected resource match the loaded configuration
             model = self.get_idn()[32:36]
-            if "2100" not in model:
+            if "21" not in model:
                 logger.warning("Driver designed to use Keithley 2100, not {} model. Problems may occur.".format(model))
             for instr in config["Keithley", "2100"]:
                 if type(config["Keithley", "2100", instr]) == dict:
@@ -77,34 +77,34 @@ class Keithley2100VISADriver:
             #     # Load the configuration matching the selected module
             #     cards = self.get_card().split(',')
             #     logger.info("card : {}".format(cards))
-                # try:
-                #     assert config["Keithley", "2100", self.instr, "MODULE01", "module_name"] == cards[0], cards[0]
-                #     self.configured_modules["MODULE01"] = cards[0]
-                # except KeyError as err:
-                #     logger.error("{}: configuration {} does not exist.".format(KeyError, err))
-                # except AssertionError as err:
-                #     logger.error("{}: Switching module {} does not match any configuration".format(
-                #         AssertionError, str(err)))
-                # # try:
-                # #     assert config["Keithley", "2100", self.instr, "MODULE02", "module_name"] == cards[1], cards[1]
-                # #     self.configured_modules["MODULE02"] = cards[1]
-                # # except KeyError as err:
-                # #     logger.error("{}: configuration {} does not exist." .format(KeyError, err))
-                # # except AssertionError as err:
-                # #     logger.error("{}: Switching module {} does not match any configuration".format(
-                # #         AssertionError, str(err)))
-                # logger.info("Configured modules : {}".format(self.configured_modules))
-                # try:
-                #     if config["Keithley", "2100", self.instr, 'MODULE01', 'module_name']\
-                #             in self.non_amp_modules_list:
-                #         self.non_amp_module["MODULE01"] = True
-                #     if config["Keithley", "2100", self.instr, 'MODULE02', 'module_name']\
-                #             in self.non_amp_modules_list:
-                #         self.non_amp_module["MODULE02"] = True
-                # except KeyError:
-                #     pass
-            # #     logger.info("Hardware initialized")
-            # # except AttributeError:
+            #     try:
+            #         assert config["Keithley", "2100", self.instr, "MODULE01", "module_name"] == cards[0], cards[0]
+            #         self.configured_modules["MODULE01"] = cards[0]
+            #     except KeyError as err:
+            #         logger.error("{}: configuration {} does not exist.".format(KeyError, err))
+            #     except AssertionError as err:
+            #         logger.error("{}: Switching module {} does not match any configuration".format(
+            #             AssertionError, str(err)))
+            #     try:
+            #         assert config["Keithley", "2100", self.instr, "MODULE02", "module_name"] == cards[1], cards[1]
+            #         self.configured_modules["MODULE02"] = cards[1]
+            #     except KeyError as err:
+            #         logger.error("{}: configuration {} does not exist." .format(KeyError, err))
+            #     except AssertionError as err:
+            #         logger.error("{}: Switching module {} does not match any configuration".format(
+            #             AssertionError, str(err)))
+            #     logger.info("Configured modules : {}".format(self.configured_modules))
+            #     try:
+            #         if config["Keithley", "2100", self.instr, 'MODULE01', 'module_name']\
+            #                 in self.non_amp_modules_list:
+            #             self.non_amp_module["MODULE01"] = True
+            #         if config["Keithley", "2100", self.instr, 'MODULE02', 'module_name']\
+            #                 in self.non_amp_modules_list:
+            #             self.non_amp_module["MODULE02"] = True
+            #     except KeyError:
+            #         pass
+            #     logger.info("Hardware initialized")
+            # except AttributeError:
             #     logger.error(AttributeError)
         except visa.errors.VisaIOError as err:
             logger.error(err)
@@ -239,23 +239,23 @@ class Keithley2100VISADriver:
         list_split_answer = str_answer.split(",")
 
         # MEASUREMENT & TIME EXTRACTION
-        # list_measurements = list_split_answer[::3]
-        # str_measurements = ''
+        list_measurements = list_split_answer[::3]
+        str_measurements = ''
         list_times = list_split_answer[1::3]
         str_times = ''
         for j in range(len(list_measurements)):
             if not j == 0:
                 str_measurements += ','
                 str_times += ','
-            # for l1 in range(len(list_measurements[j])):
-            #     test_carac = list_measurements[j][-(l1+1)]
-            #     # Remove non-digit characters (units)
-            #     if test_carac.isdigit():
-            #         if l1 == 0:
-            #             str_measurements += list_measurements[j]
-            #         else:
-            #             str_measurements += list_measurements[j][:-l1]
-            #         break
+            for l1 in range(len(list_measurements[j])):
+                test_carac = list_measurements[j][-(l1+1)]
+                # Remove non-digit characters (units)
+                if test_carac.isdigit():
+                    if l1 == 0:
+                        str_measurements += list_measurements[j]
+                    else:
+                        str_measurements += list_measurements[j][:-l1]
+                    break
             for l2 in range(len(list_times[j])):
                 test_carac = list_times[j][-(l2+1)]
                 # Remove non-digit characters (units)
@@ -267,10 +267,10 @@ class Keithley2100VISADriver:
                     break
 
         # Split created string to access each value
-        # list_measurements_values = str_measurements.split(",")
+        list_measurements_values = str_measurements.split(",")
         list_times_values = str_times.split(",")
         # Create numpy.array containing desired values (float type)
-        # array_measurements_values = np.array(list_measurements_values, dtype=float)
+        array_measurements_values = np.array(list_measurements_values, dtype=float)
         if not self.sample_count_1:
             array_times_values = np.array(list_times_values, dtype=float)
         else:
@@ -278,9 +278,9 @@ class Keithley2100VISADriver:
 
         return str_answer, array_measurements_values, array_times_values
 
-    # def get_card(self):
-    #     # Query switching module
-    #     return self._instr.query("*OPT?")
+    def get_card(self):
+        # Query switching module
+        return self._instr.query("*OPT?")
     
     def get_error(self):
         # Ask the keithley to return the last current error
@@ -420,36 +420,36 @@ if __name__ == "__main__":
         # - Testing connexion and communication with your instrument
         # - Testing new methods in developer mode
 
-        RM = visa.ResourceManager()
+        RM = visa.ResourceManager("@ivi")
         print("list resources", RM.list_resources())
 
-        # K2100 Instance of KeithleyVISADriver class (replace ASRL1::INSTR by the name of your resource)
-        K2100 = Keithley2100VISADriver("USB0::0x05E6::0x2100::1149087::INSTR")
-        K2100.init_hardware()
+        # K2700 Instance of KeithleyVISADriver class (replace ASRL1::INSTR by the name of your resource)
+        k2700 = Keithley2100VISADriver("ASRL1::INSTR")
+        k2700.init_hardware()
         print("IDN?")
-        print(K2100.get_idn())
-        K2100.reset()
-        K2100.configuration_sequence()
+        print(k2700.get_idn())
+        k2700.reset()
+        k2700.configuration_sequence()
 
         # Daq_viewer simulation first run
-        K2100.set_mode(str(input('Enter which mode you want to scan \
+        k2700.set_mode(str(input('Enter which mode you want to scan \
         [scan_scan_list, scan_volt:dc, scan_r2w, scan_temp...]:')))
         print('Manual scan example of command set to send directly: >init >*trg >trac:data?')
-        K2100.user_command()
+        k2700.user_command()
         print('Automatic scan example with 2 iterations')
         for i in range(2):
-            print(K2100.data())
-        print(K2100.data())
+            print(k2700.data())
+        print(k2700.data())
 
         # Daq_viewer simulation change mode
-        K2100.set_mode(str(input('Enter which mode you want to scan \
+        k2700.set_mode(str(input('Enter which mode you want to scan \
         [scan_scan_list, scan_volt:dc, scan_r2w, scan_temp...]:')))
         for i in range(2):
-            print(K2100.data())
-        print(K2100.data())
+            print(k2700.data())
+        print(k2700.data())
 
-        K2100.clear_buffer()
-        K2100.close()
+        k2700.clear_buffer()
+        k2700.close()
 
         print("Out")
 
