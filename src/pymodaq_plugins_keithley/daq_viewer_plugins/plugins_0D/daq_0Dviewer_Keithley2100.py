@@ -58,7 +58,7 @@ class DAQ_0DViewer_Keithley2100(DAQ_Viewer_base):
 
     def ini_attributes(self):
         """Attributes init when DAQ_0DViewer_Keithley class is instanced"""
-        self.controller: Keithley2100 = None
+        self.controller:  Keithley2100 = None
         self.channels_in_selected_mode = None
         self.rsrc_name = None
         self.panel = None
