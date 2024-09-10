@@ -174,14 +174,61 @@ class DAQ_0DViewer_Keithley27XX(DAQ_Viewer_base):
         :param kwargs: others optionals arguments
         :type kwargs: dict
         """
+        # # ACQUISITION OF DATA
+        # #TODO: Check on data acquisition from front and rear panel.
+        # if self.panel == 'FRONT':
+        #     data_tot = self.controller.data()
+        # elif self.panel == 'REAR':
+        #     data_tot = self.controller.data()
+        # self.emit(data_tot)
+
+        # FIXME: this was just restored from daq_0Dviewer_Keithley27xx.py. If this does now work, use self.emit as above.
         # ACQUISITION OF DATA
         if self.panel == 'FRONT':
             data_tot = self.controller.data()
             data_measurement = data_tot[1]
+            data_measurement = data_tot[1]
         elif self.panel == 'REAR':
             channels_in_selected_mode = self.channels_in_selected_mode[1:-1].replace('@', '')
             chan_to_plot = []
+            channels_in_selected_mode = self.channels_in_selected_mode[1:-1].replace('@', '')
+            chan_to_plot = []
             data_tot = self.controller.data()
+            data_measurement = data_tot[1]
+            for i in range(len(channels_in_selected_mode.split(','))):
+                chan_to_plot.append('Channel ' + str(channels_in_selected_mode.split(',')[i]))
+            # Affect each value to the corresponding channel
+            dict_chan_value = dict(zip(channels_in_selected_mode.split(','), data_measurement))
+        # Dictionary linking channel's modes to physical quantities
+        dict_label_mode = {'VOLT:DC': 'Voltage', 'VOLT:AC': 'Voltage', 'CURR:DC': 'Current', 'CURR:AC': 'Current',
+                           'RES': 'Resistance', 'FRES': 'Resistance', 'FREQ': 'Frequency', 'TEMP': 'Temperature'}
+        # EMISSION OF DATA
+        # When reading the scan_list, data are displayed and exported grouped by mode
+        if not self.controller.reading_scan_list:
+            label = dict_label_mode[self.controller.current_mode]
+            if self.panel == 'FRONT':
+                labels = 'Front input'
+            elif self.panel == 'REAR':
+                labels = [chan_to_plot[i] for i in range(len(chan_to_plot))]
+            dte = DataToExport(name='keithley',
+                               data=[DataFromPlugins(name=label,
+                                                     data=[np.array([data_measurement[i]]) for i in
+                                                           range(len(data_measurement))],
+                                                     dim='Data0D',
+                                                     labels=labels)])
+
+        # Reading only channels configured in the selected mode
+        elif self.controller.reading_scan_list:
+            dte = DataToExport(name='keithley',
+                               data=[DataFromPlugins(name=dict_label_mode[key],
+                                                     data=[np.array([dict_chan_value[str(chan)]]) for chan in
+                                                           self.controller.modes_channels_dict.get(key)],
+                                                     dim='Data0D',
+                                                     labels=['Channel ' + str(chan) for chan in
+                                                             self.controller.modes_channels_dict.get(key)]
+                                                     ) for key in self.controller.modes_channels_dict.keys() if
+                                     self.controller.modes_channels_dict.get(key) != []])
+        self.dte_signal.emit(dte)
             data_measurement = data_tot[1]
             for i in range(len(channels_in_selected_mode.split(','))):
                 chan_to_plot.append('Channel ' + str(channels_in_selected_mode.split(',')[i]))
