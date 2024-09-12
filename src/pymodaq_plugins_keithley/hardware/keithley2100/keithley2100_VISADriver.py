@@ -4,7 +4,7 @@ from pymodaq_plugins_keithley import config
 from pymodaq.utils.logger import set_logger, get_module_name
 logger = set_logger(get_module_name(__file__))
 
-
+print("In keithley2100_VISADriver.py")
 class Keithley2100VISADriver:
     """VISA class driver for the Keithley 2100 Multimeter/Switch System
 
@@ -15,9 +15,9 @@ class Keithley2100VISADriver:
     #TODO: Add the configuration file to the package
     # List the Keithley instruments the user has configured from the .toml configuration file
     list_instruments = {}
-    for instr in config["Keithley", "2100"].keys():
-        if "INSTRUMENT" in instr:
-            list_instruments[instr] = config["Keithley", "2100", instr, "rsrc_name"]
+    # for instr in config["Keithley", "2100"].keys():
+    #     if "INSTRUMENT" in instr:
+    #         list_instruments[instr] = config["Keithley", "2100", instr, "rsrc_name"]
     logger.info("Configured instruments: {}".format(list(list_instruments.items())))
 
     # Channels & modes attributes
