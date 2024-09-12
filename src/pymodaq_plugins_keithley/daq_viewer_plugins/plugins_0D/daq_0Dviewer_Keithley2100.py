@@ -199,7 +199,7 @@ class DAQ_0DViewer_Keithley2100(DAQ_Viewer_base):
                                                                                 dim='Data0D', labels=['time'])]))
       
        
-        self.emit(data_tot) #Emit data over time array. 
+        self.dte_signal.emit(data_tot) #Emit data over time array. 
 
     def stop(self):
         """Stop the current grab hardware wise if necessary"""
