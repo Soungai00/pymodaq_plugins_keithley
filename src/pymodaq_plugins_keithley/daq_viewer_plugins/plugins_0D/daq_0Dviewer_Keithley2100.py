@@ -1,4 +1,5 @@
 import numpy as np
+import time
 from pymodaq.utils.daq_utils import ThreadCommand
 from pymodaq.utils.data import DataFromPlugins, DataToExport
 from pymodaq.control_modules.viewer_utility_classes import DAQ_Viewer_base, comon_parameters, main
@@ -176,13 +177,29 @@ class DAQ_0DViewer_Keithley2100(DAQ_Viewer_base):
         """
         # ACQUISITION OF DATA
         #TODO: Check on data acquisition from front and rear panel. 
+        time_data = []
+        start_time = time.time()
         if self.panel == 'FRONT':
             data_tot = self.controller.data()
+            current_time = time.time() - start_time
+            time_data.append(current_time)
+            self.emit(DataToExport(name='myplugin',
+                                          data=[DataFromPlugins(name='Mock1', data=data_tot,
+                                                                dim='Data0D', labels=['dat0', 'data1']),
+                                                                DataFromPlugins(name='Mock2', data=time_data,
+                                                                                dim='Data0D', labels=['time'])]))
         elif self.panel == 'REAR':
             data_tot = self.controller.data()
+            current_time = time.time() - start_time
+            time_data.append(current_time)
+            self.emit(DataToExport(name='myplugin',
+                                          data=[DataFromPlugins(name='Mock1', data=data_tot,
+                                                                dim='Data0D', labels=['dat0', 'data1']),
+                                                                DataFromPlugins(name='Mock2', data=time_data,
+                                                                                dim='Data0D', labels=['time'])]))
       
        
-        self.emit(data_tot)
+        self.emit(data_tot) #Emit data over time array. 
 
     def stop(self):
         """Stop the current grab hardware wise if necessary"""
