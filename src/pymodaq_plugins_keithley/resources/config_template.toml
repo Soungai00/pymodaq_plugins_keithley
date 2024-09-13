@@ -32,3 +32,21 @@ info = "Channels 201 & 202 configured using thermocouple by default"
 # ref_junc = "int"
 # resolution = 6
 # nplc = 5
+
+[Keithley.2100]
+title = "Configuration entry for a Keithley 2100 Multimeter/Switch System"
+
+[Keithley.2100.INSTRUMENT01]
+title = "Instrument in wich is plugged the switching module used for data acquisition"
+rsrc_name_example = ["ASRL1::INSTR", "USB0::0x05E6::0x2100::1149087::INSTR", "TCPIP::192.168.01.01::1394::SOCKET"]
+rsrc_name = "USB0::0x05E6::0x2100::1149087::INSTR"
+model_name = ""
+panel = "rear"
+termination_character = "Keithley must be set to LF"
+
+# mode = "temp"
+# transducer = "tc"
+# type = "K"
+# ref_junc = "int"
+# resolution = 6
+# nplc = 5
