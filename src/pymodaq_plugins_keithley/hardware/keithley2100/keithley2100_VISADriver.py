@@ -239,44 +239,44 @@ class Keithley2100VISADriver:
         list_split_answer = str_answer.split(",")
 
         # MEASUREMENT & TIME EXTRACTION
-        list_measurements = list_split_answer[::3]
-        str_measurements = ''
-        list_times = list_split_answer[1::3]
-        str_times = ''
-        for j in range(len(list_measurements)):
-            if not j == 0:
-                str_measurements += ','
-                str_times += ','
-            for l1 in range(len(list_measurements[j])):
-                test_carac = list_measurements[j][-(l1+1)]
-                # Remove non-digit characters (units)
-                if test_carac.isdigit():
-                    if l1 == 0:
-                        str_measurements += list_measurements[j]
-                    else:
-                        str_measurements += list_measurements[j][:-l1]
-                    break
-            for l2 in range(len(list_times[j])):
-                test_carac = list_times[j][-(l2+1)]
-                # Remove non-digit characters (units)
-                if test_carac.isdigit():
-                    if l2 == 0:
-                        str_times += list_times[j]
-                    else:
-                        str_times += list_times[j][:-l2]
-                    break
+        # list_measurements = list_split_answer[::3] # TODO: Comment out lines on time extraction
+        # str_measurements = ''
+        # list_times = list_split_answer[1::3]
+        # str_times = ''
+        # for j in range(len(list_measurements)):
+        #     if not j == 0:
+        #         str_measurements += ','
+        #         str_times += ','
+        #     for l1 in range(len(list_measurements[j])):
+        #         test_carac = list_measurements[j][-(l1+1)]
+        #         # Remove non-digit characters (units)
+        #         if test_carac.isdigit():
+        #             if l1 == 0:
+        #                 str_measurements += list_measurements[j]
+        #             else:
+        #                 str_measurements += list_measurements[j][:-l1]
+        #             break
+        #     for l2 in range(len(list_times[j])):
+        #         test_carac = list_times[j][-(l2+1)]
+        #         # Remove non-digit characters (units)
+        #         if test_carac.isdigit():
+        #             if l2 == 0:
+        #                 str_times += list_times[j]
+        #             else:
+        #                 str_times += list_times[j][:-l2]
+        #             break
 
         # Split created string to access each value
-        list_measurements_values = str_measurements.split(",")
-        list_times_values = str_times.split(",")
+        # list_measurements_values = str_measurements.split(",")
+        # list_times_values = str_times.split(",")
         # Create numpy.array containing desired values (float type)
-        array_measurements_values = np.array(list_measurements_values, dtype=float)
-        if not self.sample_count_1:
-            array_times_values = np.array(list_times_values, dtype=float)
-        else:
-            array_times_values = np.array([0], dtype=float)
+        array_measurements_values = np.array(list_split_answer, dtype=float)
+        # if not self.sample_count_1:
+        #     array_times_values = np.array(list_times_values, dtype=float)
+        # else:
+        #     array_times_values = np.array([0], dtype=float)
 
-        return str_answer, array_measurements_values, array_times_values
+        return array_measurements_values # Returns only the measurement values
 
     def get_card(self):
         # Query switching module
