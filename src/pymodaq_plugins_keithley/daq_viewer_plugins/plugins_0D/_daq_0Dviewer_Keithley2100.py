@@ -83,7 +83,7 @@ class DAQ_0DViewer_Keithley2100(DAQ_Viewer_base):
                 value = param.value()
                 self.controller.set_mode(value)
             elif self.panel == 'REAR':
-                value = 'SCAN_' + param.value()
+                #value = 'SCAN_' + param.value()
                 self.channels_in_selected_mode = self.controller.set_mode(value)
             current_error = self.controller.get_error()
             if current_error != '0,"No error"':
