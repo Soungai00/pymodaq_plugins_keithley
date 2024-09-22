@@ -129,21 +129,6 @@ class DAQ_0DViewer_Keithley2100(DAQ_Viewer_base):
         txt = self.controller.get_idn()
         self.settings.child('K2100Params', 'ID').setValue(txt)
 
-        # # Initialize detector communication and set the default value (SCAN_LIST)
-        # if self.panel == 'FRONT':
-        #     self.settings.child('Keithley_Params', 'rearpanel').visible = False
-        #     value = self.settings.child('Keithley_Params', 'frontpanel', 'frontmode').value()
-        #     self.controller.current_mode = value
-        #     self.controller.set_mode(value)
-        # elif self.panel == 'REAR':
-        #     self.settings.child('Keithley_Params', 'frontpanel').visible = False
-        #     self.settings.child('Keithley_Params', 'frontpanel').value = 'REAR'
-        #     self.controller.configuration_sequence()
-        #     value = 'SCAN_' + self.settings.child('Keithley_Params', 'rearpanel', 'rearmode').value()
-        #     self.channels_in_selected_mode = self.controller.set_mode(value)
-        #     logger.info("Channels to plot : {}" .format(self.channels_in_selected_mode))
-        # logger.info("DAQ_viewer command sent to keithley visa driver : {}" .format(value))
-
         self.controller.set_mode(self.settings.child('K2100Params', 'mode').value())
 
         # initialize viewers with the future type of data

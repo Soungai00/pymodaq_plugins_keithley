@@ -192,6 +192,9 @@ class Keithley2100VISADriver:
         # One-shot measurement mode (Equivalent to INIT:COUNT OFF)
         self._instr.write("*RST")
 
+    def read(self):
+        return float(self._instr.query("READ?"))
+
     def set_mode(self, mode):
         """Define whether the Keithley will scan all the scan_list or only channels in the selected mode
 
