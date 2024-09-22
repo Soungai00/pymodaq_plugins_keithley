@@ -4,7 +4,7 @@ from pymodaq.utils.data import DataFromPlugins, DataToExport
 from pymodaq.control_modules.viewer_utility_classes import DAQ_Viewer_base, comon_parameters, main
 from pymodaq.utils.parameter import Parameter
 from pymodaq_plugins_keithley import config
-from pymodaq_plugins_keithley.hardware.keithley27XX.keithley27XX_VISADriver import Keithley27XXVISADriver as Keithley
+from pymodaq_plugins_keithley.hardware.keithley2100.keithley2100_VISADriver import Keithley2100VISADriver as Keithley
 from pymodaq.utils.logger import set_logger, get_module_name
 logger = set_logger(get_module_name(__file__))
 
@@ -42,21 +42,6 @@ class DAQ_0DViewer_Keithley2100(DAQ_Viewer_base):
     params = comon_parameters + [
         {'title': 'Resources', 'name': 'resources', 'type': 'list', 'limits': resources_list,
          'value': resources_list[0]},
-        # {'title': 'Keithley', 'name': 'Keithley_Params', 'type': 'group', 'children': [
-        #     {'title': 'Panel', 'name': 'panel', 'type': 'list', 'limits': ['select panel to use', 'FRONT', 'REAR'],
-        #      'value': 'select panel to use'},
-        #     {'title': 'ID', 'name': 'ID', 'type': 'text', 'value': ''},
-        #     {'title': 'FRONT panel', 'name': 'frontpanel', 'visible': False, 'type': 'group', 'children': [
-        #         {'title': 'Mode', 'name': 'frontmode', 'type': 'list',
-        #          'limits': ['VOLT:DC', 'VOLT:AC', 'CURR:DC', 'CURR:AC', 'RES', 'FRES', 'FREQ', 'TEMP'],
-        #          'value': 'VOLT:DC'},
-        #     ]},
-        #     {'title': 'REAR panel', 'name': 'rearpanel', 'visible': False, 'type': 'group', 'children': [
-        #         {'title': 'Mode', 'name': 'rearmode', 'type': 'list',
-        #          'limits': ['SCAN_LIST', 'VOLT:DC', 'VOLT:AC', 'CURR:DC', 'CURR:AC', 'RES', 'FRES', 'FREQ', 'TEMP'],
-        #          'value': 'SCAN_LIST'}
-        #     ]},
-        # ]},
         {'title': 'Keithley2100 Parameters', 'name': 'K2100Params', 'type': 'group', 'children': [
             {'title': 'ID', 'name': 'ID', 'type': 'text', 'value': ''},
             {'title': 'Mode', 'name': 'mode', 'type': 'list', 'limits': ['VDC', 'VAC', 'R2W', 'R4W'], 'value': 'VDC'},
