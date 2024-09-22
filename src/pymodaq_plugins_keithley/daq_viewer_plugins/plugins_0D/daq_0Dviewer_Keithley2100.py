@@ -143,8 +143,17 @@ class DAQ_0DViewer_Keithley2100(DAQ_Viewer_base):
 
         """
         data = self.controller.read()
-        self.data_grabed_signal.emit([utils.DataFromPlugins(name='K2100', data=[[data]], dim='Data0D',)])
-        self.ind_data += 1
+        # self.data_grabed_signal.emit([utils.DataFromPlugins(name='K2100', data=[[data]], dim='Data0D',)])
+        # dte = DataToExport(name='K2100',
+        #                    data=[[data]],
+        #                    dim='Data0D'
+        #                    )
+        dte = DataToExport(name='K2100',
+                                          data=[DataFromPlugins(name='K2100', data=data,
+                                                                dim='Data0D', labels=['dat0', 'data1'])])
+
+        self.dte_signal.emit(dte)
+        # self.ind_data += 1
 
 
     def stop(self):
