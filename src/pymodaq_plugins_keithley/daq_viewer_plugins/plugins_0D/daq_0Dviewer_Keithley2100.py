@@ -47,8 +47,8 @@ class DAQ_0DViewer_Keithley2100(DAQ_Viewer_base):
             ]},
             {'title': 'REAR panel', 'name': 'rearpanel', 'visible': False, 'type': 'group', 'children': [
                 {'title': 'Mode', 'name': 'rearmode', 'type': 'list',
-                 'limits': ['SCAN_LIST', 'VOLT:DC', 'VOLT:AC', 'CURR:DC', 'CURR:AC', 'RES', 'FRES', 'FREQ', 'TEMP'],
-                 'value': 'SCAN_LIST'}
+                 'limits': [ 'VOLT:DC', 'VOLT:AC', 'CURR:DC', 'CURR:AC', 'RES', 'FRES', 'FREQ', 'TEMP'],
+                 'value': 'VOLT:DC'},
             ]},
         ]},
     ]
@@ -82,7 +82,7 @@ class DAQ_0DViewer_Keithley2100(DAQ_Viewer_base):
                 value = param.value()
                 self.controller.set_mode(value)
             elif self.panel == 'REAR':
-                value = 'SCAN_' + param.value()
+                #value = 'SCAN_' + param.value()
                 self.channels_in_selected_mode = self.controller.set_mode(value)
             current_error = self.controller.get_error()
             if current_error != '0,"No error"':
@@ -149,7 +149,7 @@ class DAQ_0DViewer_Keithley2100(DAQ_Viewer_base):
             self.settings.child('Keithley_Params', 'frontpanel').visible = False
             self.settings.child('Keithley_Params', 'frontpanel').value = 'REAR'
             self.controller.configuration_sequence()
-            value = 'SCAN_' + self.settings.child('Keithley_Params', 'rearpanel', 'rearmode').value()
+            #value = 'SCAN_' + self.settings.child('Keithley_Params', 'rearpanel', 'rearmode').value()
             self.channels_in_selected_mode = self.controller.set_mode(value)
             logger.info("Channels to plot : {}" .format(self.channels_in_selected_mode))
         logger.info("DAQ_viewer command sent to keithley visa driver : {}" .format(value))
