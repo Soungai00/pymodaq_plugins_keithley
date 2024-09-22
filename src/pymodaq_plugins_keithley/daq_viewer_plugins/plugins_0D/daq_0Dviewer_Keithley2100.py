@@ -146,9 +146,8 @@ class DAQ_0DViewer_Keithley2100(DAQ_Viewer_base):
 
     def close(self):
         """Terminate the communication protocol"""
-        ## TODO for your custom plugin
-        raise NotImplemented  # when writing your own plugin remove this line
-        #  self.controller.your_method_to_terminate_the_communication()  # when writing your own plugin replace this line
+        self.controller.close()
+        logger.info("communication ended successfully")
 
     def grab_data(self, Naverage=1, **kwargs):
         """Start a grab from the detector
@@ -177,22 +176,10 @@ class DAQ_0DViewer_Keithley2100(DAQ_Viewer_base):
         #########################################################
 
 
-    def callback(self):
-        """optional asynchrone method called when the detector has finished its acquisition of data"""
-        data_tot = self.controller.your_method_to_get_data_from_buffer()
-        self.dte_signal.emit(DataToExport(name='myplugin',
-                                          data=[DataFromPlugins(name='Mock1', data=data_tot,
-                                                                dim='Data0D', labels=['dat0', 'data1'])]))
-
     def stop(self):
         """Stop the current grab hardware wise if necessary"""
-        ## TODO for your custom plugin
-        raise NotImplemented  # when writing your own plugin remove this line
-        self.controller.your_method_to_stop_acquisition()  # when writing your own plugin replace this line
-        self.emit_status(ThreadCommand('Update_Status', ['Some info you want to log']))
-        ##############################
+        self.emit_status(ThreadCommand('Update_Status', ['Acquisition stopped']))
         return ''
-
 
 if __name__ == '__main__':
     main(__file__)
