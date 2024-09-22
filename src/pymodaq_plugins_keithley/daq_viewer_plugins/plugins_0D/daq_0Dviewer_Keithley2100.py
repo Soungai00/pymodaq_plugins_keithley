@@ -4,7 +4,7 @@ from pymodaq.utils.data import DataFromPlugins, DataToExport
 from pymodaq.control_modules.viewer_utility_classes import DAQ_Viewer_base, comon_parameters, main
 from pymodaq.utils.parameter import Parameter
 from pymodaq_plugins_keithley import config
-from pymodaq_plugins_keithley.hardware.keithley27XX.keithley27XX_VISADriver import Keithley27XXVISADriver as Keithley
+from pymodaq_plugins_keithley.hardware.keithley2100.keithley2100_VISADriver import Keithley2100VISADriver as Keithley
 from pymodaq.utils.logger import set_logger, get_module_name
 logger = set_logger(get_module_name(__file__))
 
@@ -51,11 +51,7 @@ class DAQ_0DViewer_Keithley2100(DAQ_Viewer_base):
                  'limits': ['VOLT:DC', 'VOLT:AC', 'CURR:DC', 'CURR:AC', 'RES', 'FRES', 'FREQ', 'TEMP'],
                  'value': 'VOLT:DC'},
             ]},
-            {'title': 'REAR panel', 'name': 'rearpanel', 'visible': False, 'type': 'group', 'children': [
-                {'title': 'Mode', 'name': 'rearmode', 'type': 'list',
-                 'limits': ['SCAN_LIST', 'VOLT:DC', 'VOLT:AC', 'CURR:DC', 'CURR:AC', 'RES', 'FRES', 'FREQ', 'TEMP'],
-                 'value': 'SCAN_LIST'}
-            ]},
+
         ]},
     ]
 
@@ -71,18 +67,15 @@ class DAQ_0DViewer_Keithley2100(DAQ_Viewer_base):
         self.instr = None
 
     def commit_settings(self, param: Parameter):
-        """Apply the consequences of a change of value in the detector settings
-
-        Parameters
-        ----------
-        param: Parameter
-            A given parameter (within detector_settings) whose value has been changed by the user
         """
-        ## TODO for your custom plugin
-        if param.name() == "a_parameter_you've_added_in_self.params":
-           self.controller.your_method_to_apply_this_param_change()  # when writing your own plugin replace this line
-#        elif ...
-        ##
+            ============== ========= =================
+            **Parameters**  **Type**  **Description**
+            *param*        child node  could be the following setting parameter: 'mode'
+            ============== ========= =================
+        """
+        if param.name() == 'mode':
+            """Updates the newly selected measurement mode"""
+            self.controller.set_mode(param.value())
 
     def ini_detector(self, controller=None):
         """Detector communication initialization
