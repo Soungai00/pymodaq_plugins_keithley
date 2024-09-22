@@ -74,39 +74,6 @@ class Keithley2100VISADriver:
                         self.instr = instr
             logger.info("Instrument selected: {} ".format(config["Keithley", "2100", self.instr, "rsrc_name"]))
             logger.info("Keithley model : {}".format(config["Keithley", "2100", self.instr, "model_name"]))
-            try:
-                # Load the configuration matching the selected module
-                cards = self.get_card().split(',')
-                logger.info("card : {}".format(cards))
-                try:
-                    assert config["Keithley", "2100", self.instr, "MODULE01", "module_name"] == cards[0], cards[0]
-                    self.configured_modules["MODULE01"] = cards[0]
-                except KeyError as err:
-                    logger.error("{}: configuration {} does not exist.".format(KeyError, err))
-                except AssertionError as err:
-                    logger.error("{}: Switching module {} does not match any configuration".format(
-                        AssertionError, str(err)))
-                try:
-                    assert config["Keithley", "2100", self.instr, "MODULE02", "module_name"] == cards[1], cards[1]
-                    self.configured_modules["MODULE02"] = cards[1]
-                except KeyError as err:
-                    logger.error("{}: configuration {} does not exist." .format(KeyError, err))
-                except AssertionError as err:
-                    logger.error("{}: Switching module {} does not match any configuration".format(
-                        AssertionError, str(err)))
-                logger.info("Configured modules : {}".format(self.configured_modules))
-                try:
-                    if config["Keithley", "2100", self.instr, 'MODULE01', 'module_name']\
-                            in self.non_amp_modules_list:
-                        self.non_amp_module["MODULE01"] = True
-                    if config["Keithley", "2100", self.instr, 'MODULE02', 'module_name']\
-                            in self.non_amp_modules_list:
-                        self.non_amp_module["MODULE02"] = True
-                except KeyError:
-                    pass
-                logger.info("Hardware initialized")
-            except AttributeError:
-                logger.error(AttributeError)
         except visa.errors.VisaIOError as err:
             logger.error(err)
 
