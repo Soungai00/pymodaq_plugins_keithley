@@ -42,20 +42,25 @@ class DAQ_0DViewer_Keithley2100(DAQ_Viewer_base):
     params = comon_parameters + [
         {'title': 'Resources', 'name': 'resources', 'type': 'list', 'limits': resources_list,
          'value': resources_list[0]},
-        {'title': 'Keithley', 'name': 'Keithley_Params', 'type': 'group', 'children': [
-            {'title': 'Panel', 'name': 'panel', 'type': 'list', 'limits': ['select panel to use', 'FRONT', 'REAR'],
-             'value': 'select panel to use'},
+        # {'title': 'Keithley', 'name': 'Keithley_Params', 'type': 'group', 'children': [
+        #     {'title': 'Panel', 'name': 'panel', 'type': 'list', 'limits': ['select panel to use', 'FRONT', 'REAR'],
+        #      'value': 'select panel to use'},
+        #     {'title': 'ID', 'name': 'ID', 'type': 'text', 'value': ''},
+        #     {'title': 'FRONT panel', 'name': 'frontpanel', 'visible': False, 'type': 'group', 'children': [
+        #         {'title': 'Mode', 'name': 'frontmode', 'type': 'list',
+        #          'limits': ['VOLT:DC', 'VOLT:AC', 'CURR:DC', 'CURR:AC', 'RES', 'FRES', 'FREQ', 'TEMP'],
+        #          'value': 'VOLT:DC'},
+        #     ]},
+        #     {'title': 'REAR panel', 'name': 'rearpanel', 'visible': False, 'type': 'group', 'children': [
+        #         {'title': 'Mode', 'name': 'rearmode', 'type': 'list',
+        #          'limits': ['SCAN_LIST', 'VOLT:DC', 'VOLT:AC', 'CURR:DC', 'CURR:AC', 'RES', 'FRES', 'FREQ', 'TEMP'],
+        #          'value': 'SCAN_LIST'}
+        #     ]},
+        # ]},
+        {'title': 'Keithley2100 Parameters', 'name': 'K2100Params', 'type': 'group', 'children': [
             {'title': 'ID', 'name': 'ID', 'type': 'text', 'value': ''},
-            {'title': 'FRONT panel', 'name': 'frontpanel', 'visible': False, 'type': 'group', 'children': [
-                {'title': 'Mode', 'name': 'frontmode', 'type': 'list',
-                 'limits': ['VOLT:DC', 'VOLT:AC', 'CURR:DC', 'CURR:AC', 'RES', 'FRES', 'FREQ', 'TEMP'],
-                 'value': 'VOLT:DC'},
-            ]},
-            {'title': 'REAR panel', 'name': 'rearpanel', 'visible': False, 'type': 'group', 'children': [
-                {'title': 'Mode', 'name': 'rearmode', 'type': 'list',
-                 'limits': ['SCAN_LIST', 'VOLT:DC', 'VOLT:AC', 'CURR:DC', 'CURR:AC', 'RES', 'FRES', 'FREQ', 'TEMP'],
-                 'value': 'SCAN_LIST'}
-            ]},
+            {'title': 'Mode', 'name': 'mode', 'type': 'list', 'limits': ['VDC', 'VAC', 'R2W', 'R4W'], 'value': 'VDC'},
+
         ]},
     ]
 
@@ -122,22 +127,27 @@ class DAQ_0DViewer_Keithley2100(DAQ_Viewer_base):
         # Keithley initialization & identification
         self.controller.init_hardware()
         txt = self.controller.get_idn()
-        self.settings.child('Keithley_Params', 'ID').setValue(txt)
+        self.settings.child('K2100Params', 'ID').setValue(txt)
 
-        # Initialize detector communication and set the default value (SCAN_LIST)
-        if self.panel == 'FRONT':
-            self.settings.child('Keithley_Params', 'rearpanel').visible = False
-            value = self.settings.child('Keithley_Params', 'frontpanel', 'frontmode').value()
-            self.controller.current_mode = value
-            self.controller.set_mode(value)
-        elif self.panel == 'REAR':
-            self.settings.child('Keithley_Params', 'frontpanel').visible = False
-            self.settings.child('Keithley_Params', 'frontpanel').value = 'REAR'
-            self.controller.configuration_sequence()
-            value = 'SCAN_' + self.settings.child('Keithley_Params', 'rearpanel', 'rearmode').value()
-            self.channels_in_selected_mode = self.controller.set_mode(value)
-            logger.info("Channels to plot : {}" .format(self.channels_in_selected_mode))
-        logger.info("DAQ_viewer command sent to keithley visa driver : {}" .format(value))
+        # # Initialize detector communication and set the default value (SCAN_LIST)
+        # if self.panel == 'FRONT':
+        #     self.settings.child('Keithley_Params', 'rearpanel').visible = False
+        #     value = self.settings.child('Keithley_Params', 'frontpanel', 'frontmode').value()
+        #     self.controller.current_mode = value
+        #     self.controller.set_mode(value)
+        # elif self.panel == 'REAR':
+        #     self.settings.child('Keithley_Params', 'frontpanel').visible = False
+        #     self.settings.child('Keithley_Params', 'frontpanel').value = 'REAR'
+        #     self.controller.configuration_sequence()
+        #     value = 'SCAN_' + self.settings.child('Keithley_Params', 'rearpanel', 'rearmode').value()
+        #     self.channels_in_selected_mode = self.controller.set_mode(value)
+        #     logger.info("Channels to plot : {}" .format(self.channels_in_selected_mode))
+        # logger.info("DAQ_viewer command sent to keithley visa driver : {}" .format(value))
+
+        self.controller.set_mode(self.settings.child('K2100Params', 'mode').value())
+
+        # initialize viewers with the future type of data
+        # self.data_grabed_signal.emit([DataFromPlugins(name='Keithley2100', data=[0], dim='Data0D', labels=['Meas', 'Time'])])
 
         self.status.initialized = True
         self.status.controller = self.controller
@@ -150,30 +160,21 @@ class DAQ_0DViewer_Keithley2100(DAQ_Viewer_base):
         logger.info("communication ended successfully")
 
     def grab_data(self, Naverage=1, **kwargs):
-        """Start a grab from the detector
-
-        Parameters
-        ----------
-        Naverage: int
-            Number of hardware averaging (if hardware averaging is possible, self.hardware_averaging should be set to
-            True in class preamble and you should code this implementation)
-        kwargs: dict
-            others optionals arguments
         """
-        ## TODO for your custom plugin: you should choose EITHER the synchrone or the asynchrone version following
+            | Start new acquisition.
+            |
+            |
+            | Send the data_grabed_signal once done.
 
-        # synchrone version (blocking function)
-        raise NotImplemented  # when writing your own plugin remove this line
-        data_tot = self.controller.your_method_to_start_a_grab_snap()
-        self.dte_signal.emit(DataToExport(name='myplugin',
-                                          data=[DataFromPlugins(name='Mock1', data=data_tot,
-                                                                dim='Data0D', labels=['dat0', 'data1'])]))
-        #########################################################
+            =============== ======== ===============================================
+            **Parameters**  **Type**  **Description**
+            *Naverage*      int       specify the threshold of the mean calculation
+            =============== ======== ===============================================
 
-        # asynchrone version (non-blocking function with callback)
-        raise NotImplemented  # when writing your own plugin remove this line
-        self.controller.your_method_to_start_a_grab_snap(self.callback)  # when writing your own plugin replace this line
-        #########################################################
+        """
+        data = self.controller.read()
+        self.data_grabed_signal.emit([utils.DataFromPlugins(name='K2100', data=[[data]], dim='Data0D',)])
+        self.ind_data += 1
 
 
     def stop(self):
