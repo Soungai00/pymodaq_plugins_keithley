@@ -20,24 +20,6 @@ class Keithley2100VISADriver:
             list_instruments[instr] = config["Keithley", "2100", instr, "rsrc_name"]
     logger.info("Configured instruments: {}".format(list(list_instruments.items())))
 
-    # # Non-amps modules
-    # non_amp_module = {"MODULE01": False, "MODULE02": False}
-    # non_amp_modules_list = ['7701', '7703', '7706', '7707', '7708', '7709']
-    #
-    # # Channels & modes attributes
-    # channels_scan_list = ''
-    # modes_channels_dict = {'VOLT:DC': [],
-    #                        'VOLT:AC': [],
-    #                        'CURR:DC': [],
-    #                        'CURR:AC': [],
-    #                        'RES': [],
-    #                        'FRES': [],
-    #                        'FREQ': [],
-    #                        'TEMP': []}
-    # sample_count_1 = False
-    # reading_scan_list = False
-    # current_mode = ''
-
     def __init__(self, rsrc_name):
         """Initialize KeithleyVISADriver class
 
