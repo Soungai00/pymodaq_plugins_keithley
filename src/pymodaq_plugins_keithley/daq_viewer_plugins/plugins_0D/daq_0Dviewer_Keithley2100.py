@@ -44,7 +44,7 @@ class DAQ_0DViewer_Keithley2100(DAQ_Viewer_base):
          'value': resources_list[0]},
         {'title': 'Keithley2100 Parameters', 'name': 'K2100Params', 'type': 'group', 'children': [
             {'title': 'ID', 'name': 'ID', 'type': 'text', 'value': ''},
-            {'title': 'Mode', 'name': 'mode', 'type': 'list', 'limits': ['VDC', 'VAC', 'R2W', 'R4W'], 'value': 'VDC'},
+            {'title': 'Mode', 'name': 'mode', 'type': 'list', 'limits': ['VDC', 'VAC', 'IDC', 'IAC', 'R2W', 'R4W'], 'value': 'VDC'},
 
         ]},
     ]
@@ -68,10 +68,9 @@ class DAQ_0DViewer_Keithley2100(DAQ_Viewer_base):
         param: Parameter
             A given parameter (within detector_settings) whose value has been changed by the user
         """
-        ## TODO for your custom plugin
         if param.name() == "mode":
-           self.controller.set_mode()
-           print("mode changed to {}".format(param.value())) #print the new value of the mode
+           self.controller.set_mode(param.value())
+           logger.info("mode changed to {}".format(param.value())) #print the new value of the mode
         else:
             raise Exception("Unknown setting name") #raise an exception if the setting name is unknown
 
