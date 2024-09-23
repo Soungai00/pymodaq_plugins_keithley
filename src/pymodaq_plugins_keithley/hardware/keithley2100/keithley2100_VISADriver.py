@@ -76,6 +76,11 @@ class Keithley2100VISADriver:
         self._instr.close()
 
     def data(self):
+        # """Get data from instrument
+        # """
+        # return float(self._instr.query(":READ?"))
+
+        # FIXME: this was just restored from daq_0Dviewer_Keithley27xx.py. If this does now work, use return float(self._instr.query(":READ?")) as above.
         """Get data from instrument
 
         Make the Keithley perform 3 actions: init, trigger, fetch. Then process the answer to return 3 variables:
