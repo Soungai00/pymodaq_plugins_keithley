@@ -9,6 +9,12 @@ from pymodaq.utils.logger import set_logger, get_module_name
 logger = set_logger(get_module_name(__file__))
 
 
+# TODO:
+# (1) change the name of the following class to DAQ_0DViewer_TheNameOfYourChoice
+# (2) change the name of this file to daq_0Dviewer_TheNameOfYourChoice ("TheNameOfYourChoice" should be the SAME
+#     for the class name and the file name.)
+# (3) this file should then be put into the right folder, namely IN THE FOLDER OF THE PLUGIN YOU ARE DEVELOPING:
+#     pymodaq_plugins_my_plugin/daq_viewer_plugins/plugins_0D
 class DAQ_0DViewer_Keithley2100(DAQ_Viewer_base):
     """ Keithley plugin class for a OD viewer.
 
@@ -36,20 +42,10 @@ class DAQ_0DViewer_Keithley2100(DAQ_Viewer_base):
     params = comon_parameters + [
         {'title': 'Resources', 'name': 'resources', 'type': 'list', 'limits': resources_list,
          'value': resources_list[0]},
-        {'title': 'Keithley', 'name': 'Keithley_Params', 'type': 'group', 'children': [
-            {'title': 'Panel', 'name': 'panel', 'type': 'list', 'limits': ['select panel to use', 'FRONT', 'REAR'],
-             'value': 'select panel to use'},
+        {'title': 'Keithley2100 Parameters', 'name': 'K2100Params', 'type': 'group', 'children': [
             {'title': 'ID', 'name': 'ID', 'type': 'text', 'value': ''},
-            {'title': 'FRONT panel', 'name': 'frontpanel', 'visible': False, 'type': 'group', 'children': [
-                {'title': 'Mode', 'name': 'frontmode', 'type': 'list',
-                 'limits': ['VOLT:DC', 'VOLT:AC', 'CURR:DC', 'CURR:AC', 'RES', 'FRES', 'FREQ', 'TEMP'],
-                 'value': 'VOLT:DC'},
-            ]},
-            {'title': 'REAR panel', 'name': 'rearpanel', 'visible': False, 'type': 'group', 'children': [
-                {'title': 'Mode', 'name': 'rearmode', 'type': 'list',
-                 'limits': [ 'VOLT:DC', 'VOLT:AC', 'CURR:DC', 'CURR:AC', 'RES', 'FRES', 'FREQ', 'TEMP'],
-                 'value': 'VOLT:DC'},
-            ]},
+            {'title': 'Mode', 'name': 'mode', 'type': 'list', 'limits': ['VDC', 'VAC', 'R2W', 'R4W'], 'value': 'VDC'},
+
         ]},
     ]
 
@@ -65,39 +61,18 @@ class DAQ_0DViewer_Keithley2100(DAQ_Viewer_base):
         self.instr = None
 
     def commit_settings(self, param: Parameter):
-        """Apply the consequences of a change of value in the detector settings"""
-        if param.name() == 'panel':
-            for limit in ['REAR', 'FRONT']:
-                if not limit == param.value():
-                    if param.value() == 'select panel to use':
-                        self.settings.child('Keithley_Params', 'frontpanel').show()
-                        self.settings.child('Keithley_Params', 'rearpanel').show()
-                    else:
-                        self.settings.child('Keithley_Params', param.value().lower() + param.name()).show()
-                        self.settings.child('Keithley_Params', limit.lower() + param.name()).hide()
-        if 'mode' in param.name():
-            """Updates the newly selected measurement mode"""
-            # Read the configuration file to determine which mode to use and send corresponding instruction to driver
-            if self.panel == 'FRONT':
-                value = param.value()
-                self.controller.set_mode(value)
-            elif self.panel == 'REAR':
-                #value = 'SCAN_' + param.value()
-                self.channels_in_selected_mode = self.controller.set_mode(value)
-            current_error = self.controller.get_error()
-            if current_error != '0,"No error"':
-                logger.error("The following error has been raised by the Keithley:\
-                        {} => Please refer to the User Manual to correct it\n\
-                        Note: To make sure channels are well configured in the .toml file,\
-                        refer to section 15 'SCPI Reference Tables', Table 15-5" .format(current_error))
-        if 'CURR' in param.value():
-            """Verify if the switching modules support current measurement"""
-            if self.controller.non_amp_module["MODULE01"] and self.controller.non_amp_module["MODULE02"]:
-                logger.info("Both modules don't support current measurement")
-            if self.controller.non_amp_module["MODULE01"] and not self.controller.non_amp_module["MODULE02"]:
-                logger.info("Both modules don't support current measurement")
-            if self.controller.non_amp_module["MODULE02"] and not self.controller.non_amp_module["MODULE01"]:
-                logger.info("Both modules don't support current measurement")
+        """Apply the consequences of a change of value in the detector settings
+
+        Parameters
+        ----------
+        param: Parameter
+            A given parameter (within detector_settings) whose value has been changed by the user
+        """
+        ## TODO for your custom plugin
+        if param.name() == "a_parameter_you've_added_in_self.params":
+           self.controller.your_method_to_apply_this_param_change()  # when writing your own plugin replace this line
+#        elif ...
+        ##
 
     def ini_detector(self, controller=None):
         """Detector communication initialization
@@ -137,22 +112,12 @@ class DAQ_0DViewer_Keithley2100(DAQ_Viewer_base):
         # Keithley initialization & identification
         self.controller.init_hardware()
         txt = self.controller.get_idn()
-        self.settings.child('Keithley_Params', 'ID').setValue(txt)
+        self.settings.child('K2100Params', 'ID').setValue(txt)
 
-        # Initialize detector communication and set the default value (SCAN_LIST)
-        if self.panel == 'FRONT':
-            self.settings.child('Keithley_Params', 'rearpanel').visible = False
-            value = self.settings.child('Keithley_Params', 'frontpanel', 'frontmode').value()
-            self.controller.current_mode = value
-            self.controller.set_mode(value)
-        elif self.panel == 'REAR':
-            self.settings.child('Keithley_Params', 'frontpanel').visible = False
-            self.settings.child('Keithley_Params', 'frontpanel').value = 'REAR'
-            self.controller.configuration_sequence()
-            #value = 'SCAN_' + self.settings.child('Keithley_Params', 'rearpanel', 'rearmode').value()
-            self.channels_in_selected_mode = self.controller.set_mode(value)
-            logger.info("Channels to plot : {}" .format(self.channels_in_selected_mode))
-        logger.info("DAQ_viewer command sent to keithley visa driver : {}" .format(value))
+        self.controller.set_mode(self.settings.child('K2100Params', 'mode').value())
+
+        # initialize viewers with the future type of data
+        # self.data_grabed_signal.emit([DataFromPlugins(name='Keithley2100', data=[0], dim='Data0D', labels=['Meas', 'Time'])])
 
         self.status.initialized = True
         self.status.controller = self.controller
@@ -165,64 +130,29 @@ class DAQ_0DViewer_Keithley2100(DAQ_Viewer_base):
         logger.info("communication ended successfully")
 
     def grab_data(self, Naverage=1, **kwargs):
-        """Start a grab from the detector
-
-        :param Naverage: Number of hardware averaging (if hardware averaging is possible,
-            self.hardware_averaging should be set to True in class preamble, and you should code this implementation)
-        :type Naverage: int
-
-        :param kwargs: others optionals arguments
-        :type kwargs: dict
         """
-        # ACQUISITION OF DATA
-        if self.panel == 'FRONT':
-            data_tot = self.controller.data()
-            #data_measurement = data_tot
-        elif self.panel == 'REAR':
-            # channels_in_selected_mode = self.channels_in_selected_mode[1:-1].replace('@', '')
-            # chan_to_plot = []
-            data_tot = self.controller.data()
-            #data_measurement = data_tot
-            # for i in range(len(channels_in_selected_mode.split(','))):
-            #     chan_to_plot.append('Channel ' + str(channels_in_selected_mode.split(',')[i]))
-            # Affect each value to the corresponding channel
-            # dict_chan_value = dict(zip(channels_in_selected_mode.split(','), data_measurement))
-        # Dictionary linking channel's modes to physical quantities
-        dict_label_mode = {'VOLT:DC': 'Voltage', 'VOLT:AC': 'Voltage', 'CURR:DC': 'Current', 'CURR:AC': 'Current',
-                           'RES': 'Resistance', 'FRES': 'Resistance', 'FREQ': 'Frequency', 'TEMP': 'Temperature'}
-        # EMISSION OF DATA
-        # When reading the scan_list, data are displayed and exported grouped by mode
-        # if not self.controller.reading_scan_list:
-        label = dict_label_mode[self.controller.current_mode]
-        if self.panel == 'FRONT':
-            labels = 'Front input'
-        elif self.panel == 'REAR':
-            labels = 'Rear input'
-        #         # labels = [chan_to_plot[i] for i in range(len(chan_to_plot))]
-        dte = DataToExport(name='keithley',
-                               data=[DataFromPlugins(name=label,
-                                                     data=[np.array([data_tot])], #TODO: [[data_measurement]]?
-                                                     dim='Data0D',
-                                                     labels=labels)])
+            | Start new acquisition.
+            |
+            |
+            | Send the data_grabed_signal once done.
 
-        # Reading only channels configured in the selected mode
-        # elif self.controller.reading_scan_list:
-        #     dte = DataToExport(name='keithley',
-        #                        data=[DataFromPlugins(name=dict_label_mode[key],
-        #                                              data=[np.array([dict_chan_value[str(chan)]]) for chan in
-        #                                                    self.controller.modes_channels_dict.get(key)],
-        #                                              dim='Data0D',
-        #                                              labels=['Channel ' + str(chan) for chan in
-        #                                                      self.controller.modes_channels_dict.get(key)]
-        #                                              ) for key in self.controller.modes_channels_dict.keys() if
-        #                              self.controller.modes_channels_dict.get(key) != []])
+            =============== ======== ===============================================
+            **Parameters**  **Type**  **Description**
+            *Naverage*      int       specify the threshold of the mean calculation
+            =============== ======== ===============================================
+
+        """
+        data = self.controller.read()
+        dte = DataToExport(name='K2100',
+                                          data=[DataFromPlugins(name='K2100', data=data,
+                                                                dim='Data0D', labels=['dat0', 'data1'])])
+
         self.dte_signal.emit(dte)
 
     def stop(self):
         """Stop the current grab hardware wise if necessary"""
         self.emit_status(ThreadCommand('Update_Status', ['Acquisition stopped']))
         return ''
-
 
 if __name__ == '__main__':
     main(__file__)
