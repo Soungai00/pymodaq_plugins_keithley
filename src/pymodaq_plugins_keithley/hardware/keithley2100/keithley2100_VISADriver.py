@@ -177,85 +177,45 @@ class Keithley2100VISADriver:
     def read(self):
         return float(self._instr.query("READ?"))
 
-    def set_mode(self, mode):
-        """Define whether the Keithley will scan all the scan_list or only channels in the selected mode
-
-        :param mode: Supported modes: 'SCAN_LIST', 'VDC', 'VAC', 'IDC', 'IAC', 'R2W', 'R4W', 'FREQ' and 'TEMP'
-        :type mode: string
+    def set_mode(self, mode, **kwargs):
         """
-        mode = mode.upper()
-        
-        # FRONT panel
-        if "SCAN" not in mode:
-            self.init_cont_on()
-            self.sample_count_1 = True
-            self.reading_scan_list = False
-            self._instr.write("FUNC '" + mode + "'")
 
-        # REAR panel
-        else:
-            self.clear_buffer()
-            # Init continuous disabled
-            self.init_cont_off()
-            mode = mode[5:]
-            self.current_mode = mode
-            if 'SCAN_LIST' in mode:
-                self.reading_scan_list = True
-                self.sample_count_1 = False
-                channels = '(@' + self.channels_scan_list + ')'
-                # Set to perform 1 to INF scan(s)
-                self._instr.write("TRIG:COUN 1")
-                # Trigger immediately after previous scan end if IMM
-                self._instr.write("TRIG:SOUR BUS")
-                # Set to scan <n> channels
-                samp_count = 1 + channels.count(',')
-                self._instr.write("SAMP:COUN "+str(samp_count))
-                # Disable scan if currently enabled
-                self._instr.write("ROUT:SCAN:LSEL NONE")
-                # Set scan list channels
-                self._instr.write("ROUT:SCAN " + channels)
-                # Start scan immediately when enabled and triggered
-                self._instr.write("ROUT:SCAN:TSO IMM")
-                # Enable scan
-                self._instr.write("ROUT:SCAN:LSEL INT")
+        Parameters
+        ----------
+        mode    (string)    Measurement configuration ('VDC', 'VAC', 'IDC', 'IAC', 'R2W' and 'R4W' modes are supported)
+        kwargs  (dict)      Used to pass optional arguments ('range' and 'resolution' are the only supported keys)
 
-            else:
-                self.reading_scan_list = False
-                # Select channels in the channels list (config file) matching the requested mode
-                channels = '(@' + str(self.modes_channels_dict[mode])[1:-1] + ')'
-                # Set to perform 1 to INF scan(s)
-                self._instr.write("TRIG:COUN 1")
-                # Set to scan <n> channels
-                samp_count = 1+channels.count(',')
-                self._instr.write("SAMP:COUN "+str(samp_count))
-                if samp_count == 1:
-                    self.init_cont_on()
-                    # Trigger definition
-                    self._instr.write("TRIG:SOUR IMM")
-                    # Disable scan if currently enabled
-                    self._instr.write("ROUT:SCAN:LSEL NONE")
-                    self._instr.write("ROUT:CLOS " + channels)
-                    
-                    self._instr.write("FUNC '" + mode + "'")
-                    logger.info("rear sample count: {}".format(self.sample_count_1))
-                    if not self.sample_count_1:
-                        self.sample_count_1 = True
-                    self.reading_scan_list = False
-                else:
-                    self.sample_count_1 = False
-                    # Trigger definition
-                    self._instr.write("TRIG:SOUR BUS")
-                    # Disable scan if currently enabled
-                    self._instr.write("ROUT:SCAN:LSEL NONE")
-                    # Set scan list channels
-                    self._instr.write("ROUT:SCAN " + channels)
-                    # Start scan immediately when enabled and triggered
-                    self._instr.write("ROUT:SCAN:TSO IMM")
-                    # Enable scan
-                    self._instr.write("ROUT:SCAN:LSEL INT")
-                
-            return channels
-        
+        Returns
+        -------
+
+        """
+        assert (isinstance(mode, str))
+        mode = mode.lower()
+
+        cmd = ':CONF:'
+
+        if mode == "Ohm2".lower() or mode == "R2W".lower():
+            cmd += "RES"
+        elif mode == "Ohm4".lower() or mode == "R4W".lower():
+            cmd += "FRES"
+        elif mode == "VDC".lower() or mode == "V".lower():
+            cmd += "VOLT:DC"
+        elif mode == "VAC".lower():
+            cmd += "VOLT:AC"
+        elif mode == "IDC".lower() or mode == "I".lower():
+            cmd += "CURR:DC"
+        elif mode == "IAC".lower():
+            cmd += "CURR:AC"
+
+        if 'range' in kwargs.keys():
+            cmd += ' ' + str(kwargs['range'])
+            if 'resolution' in kwargs.keys():
+                cmd += ',' + str(kwargs['resolution'])
+        elif 'resolution' in kwargs.keys():
+            cmd += ' DEF,' + str(kwargs['resolution'])
+
+        self._instr.write(cmd)
+
     def stop_acquisition(self):
         # If scan in process, stop it
         self._instr.write("ROUT:SCAN:LSEL NONE")
