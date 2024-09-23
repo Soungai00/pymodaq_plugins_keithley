@@ -60,7 +60,7 @@ class DAQ_0DViewer_Keithley2100(DAQ_Viewer_base):
         self.panel = None
         self.instr = None
 
-    def commit_settings(self, param: Parameter):
+    def commit_settings(self, param):
         """Apply the consequences of a change of value in the detector settings
 
         Parameters
@@ -69,10 +69,11 @@ class DAQ_0DViewer_Keithley2100(DAQ_Viewer_base):
             A given parameter (within detector_settings) whose value has been changed by the user
         """
         ## TODO for your custom plugin
-        if param.name() == "a_parameter_you've_added_in_self.params":
-           self.controller.your_method_to_apply_this_param_change()  # when writing your own plugin replace this line
-#        elif ...
-        ##
+        if param.name() == "mode":
+           self.controller.set_mode()
+           print("mode changed to {}".format(param.value())) #print the new value of the mode
+        else:
+            raise Exception("Unknown setting name") #raise an exception if the setting name is unknown
 
     def ini_detector(self, controller=None):
         """Detector communication initialization
