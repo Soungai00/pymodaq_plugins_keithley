@@ -10,8 +10,7 @@ class Keithley2100VISADriver:
 
     This class relies on pyvisa module to communicate with the instrument via VISA protocol.
     Please refer to the instrument reference manual available at:
-    https://PLACEHOLDER.pdf
-    https://PLACEHOLDER.pdf
+    https://www.tek.com/en/manual/keithley-model-2100-6-1-2-digit-resolution-digital-multimeter-calibration-manual
     """
     # List the Keithley instruments the user has configured from the .toml configuration file
     list_instruments = {}
@@ -46,7 +45,7 @@ class Keithley2100VISADriver:
                                            read_termination="\n",
                                            )
             self._instr.timeout = 10000
-            # Check if the selected resource match the loaded configuration
+
             model = self.get_idn()[32:36]
             if "21" not in model:
                 logger.warning("Driver designed to use Keithley 2100, not {} model. Problems may occur.".format(model))
