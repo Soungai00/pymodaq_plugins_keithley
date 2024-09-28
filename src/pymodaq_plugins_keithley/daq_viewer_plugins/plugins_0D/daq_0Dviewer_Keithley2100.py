@@ -9,12 +9,7 @@ from pymodaq.utils.logger import set_logger, get_module_name
 logger = set_logger(get_module_name(__file__))
 
 
-# TODO:
-# (1) change the name of the following class to DAQ_0DViewer_TheNameOfYourChoice
-# (2) change the name of this file to daq_0Dviewer_TheNameOfYourChoice ("TheNameOfYourChoice" should be the SAME
-#     for the class name and the file name.)
-# (3) this file should then be put into the right folder, namely IN THE FOLDER OF THE PLUGIN YOU ARE DEVELOPING:
-#     pymodaq_plugins_my_plugin/daq_viewer_plugins/plugins_0D
+
 class DAQ_0DViewer_Keithley2100(DAQ_Viewer_base):
     """ Keithley plugin class for a OD viewer.
 
@@ -68,12 +63,10 @@ class DAQ_0DViewer_Keithley2100(DAQ_Viewer_base):
         param: Parameter
             A given parameter (within detector_settings) whose value has been changed by the user
         """
-        ## TODO for your custom plugin
+       
         if param.name() == "mode":
            self.controller.set_mode()
-           print("mode changed to {}".format(param.value())) #print the new value of the mode
-        else:
-            raise Exception("Unknown setting name") #raise an exception if the setting name is unknown
+           logger.info("mode changed to {}".format(param.value())) 
 
     def ini_detector(self, controller=None):
         """Detector communication initialization
@@ -93,7 +86,6 @@ class DAQ_0DViewer_Keithley2100(DAQ_Viewer_base):
                 self.controller = controller
         else:
             try:
-                # Select the resource to connect with and load the dedicated configuration
                 for instr in config["Keithley", "2100"]:
                     if "INSTRUMENT" in instr:
                         if config["Keithley", "2100", instr, "rsrc_name"] == self.settings["resources"]:
@@ -116,9 +108,6 @@ class DAQ_0DViewer_Keithley2100(DAQ_Viewer_base):
         self.settings.child('K2100Params', 'ID').setValue(txt)
 
         self.controller.set_mode(self.settings.child('K2100Params', 'mode').value())
-
-        # initialize viewers with the future type of data
-        # self.data_grabed_signal.emit([DataFromPlugins(name='Keithley2100', data=[0], dim='Data0D', labels=['Meas', 'Time'])])
 
         self.status.initialized = True
         self.status.controller = self.controller
@@ -145,8 +134,8 @@ class DAQ_0DViewer_Keithley2100(DAQ_Viewer_base):
         """
         data = self.controller.read()
         dte = DataToExport(name='K2100',
-                                          data=[DataFromPlugins(name='K2100', data=data,
-                                                                dim='Data0D', labels=['dat0', 'data1'])])
+                                        data=[DataFromPlugins(name='K2100', data=data,
+                                                            dim='Data0D', labels=['dat0', 'data1'])])
 
         self.dte_signal.emit(dte)
 
