@@ -8,6 +8,11 @@ from pymodaq_plugins_keithley.hardware.keithley2100.keithley2100_VISADriver impo
 from pymodaq.utils.logger import set_logger, get_module_name
 logger = set_logger(get_module_name(__file__))
 
+rsrc_name: str
+instr: str
+panel: str
+channels_in_selected_mode: str
+resources_list = []
 
 
 class DAQ_0DViewer_Keithley2100(DAQ_Viewer_base):
@@ -22,11 +27,7 @@ class DAQ_0DViewer_Keithley2100(DAQ_Viewer_base):
     :param params: Parameters displayed in the daq_viewer interface
     :type params: dictionary list
     """
-    rsrc_name: str
-    instr: str
-    panel: str
-    channels_in_selected_mode: str
-    resources_list = []
+
     
     # Read configuration file
     for instr in config["Keithley", "2100"].keys():
@@ -79,36 +80,21 @@ class DAQ_0DViewer_Keithley2100(DAQ_Viewer_base):
         """
         logger.info("Detector 0D initialized")
 
-        if self.settings.child('controller_status').value() == "Slave":
-            if controller is None:
-                raise Exception('no controller has been defined externally while this detector is a slave one')
-            else:
-                self.controller = controller
+        if self.is_master: 
+            self.controller = Keithley(self.rsrc_name)
+            self.controller.init_hardware()
+            txt = self.controller.get_idn()
+            self.settings.child('K2100Params', 'ID').setValue(txt)
+            self.controller.set_mode(self.settings.child('K2100Params', 'mode').value())
         else:
-            try:
-                for instr in config["Keithley", "2100"]:
-                    if "INSTRUMENT" in instr:
-                        if config["Keithley", "2100", instr, "rsrc_name"] == self.settings["resources"]:
-                            self.rsrc_name = config["Keithley", "2100", instr, "rsrc_name"]
-                            self.panel = config["Keithley", "2100", instr, "panel"].upper()
-                            self.instr = instr
-                            logger.info("Panel configuration 0D_viewer: {}" .format(self.panel))
-                assert self.rsrc_name is not None, "rsrc_name"
-                assert self.panel is not None, "panel"
-                self.controller = Keithley(self.rsrc_name)
-            except AssertionError as err:
-                logger.error("{}: {} did not match any configuration".format(type(err), str(err)))
-            except Exception as e:
-                raise Exception('No controller could be defined because an error occurred \
-                while connecting to the instrument. Error: {}'.format(str(e)))
+            logger.warning("No controller found")
+            self.status.initialized = False
+            return self.status 
+        
+        self.dte_signal_temp.emit(DataToExport(name = 'K2100', data = [DataFromPlugins(name = 'K2100_1', 
+                                                data = [np.array([0]), np.array([0])], dim = 'Data0D', Labels = ['time', 'voltage'])]))
 
-        # Keithley initialization & identification
-        self.controller.init_hardware()
-        txt = self.controller.get_idn()
-        self.settings.child('K2100Params', 'ID').setValue(txt)
-
-        self.controller.set_mode(self.settings.child('K2100Params', 'mode').value())
-
+       
         self.status.initialized = True
         self.status.controller = self.controller
 
