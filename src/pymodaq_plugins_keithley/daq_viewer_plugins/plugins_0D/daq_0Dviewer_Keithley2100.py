@@ -98,14 +98,12 @@ class DAQ_0DViewer_Keithley2100(DAQ_Viewer_base):
 
         if self.is_master:
             self.controller = Keithley(self.rsrc_name)
-            self.controller.init_hardware()
-            txt = self.controller.get_idn()
+            initialized = self.controller.init_hardware()
+            info = txt = self.controller.get_idn()
             self.settings.child("K2100Params", "ID").setValue(txt)
             self.controller.set_mode(self.settings.child("K2100Params", "mode").value())
         else:
             logger.warning("No controller found")
-            self.status.initialized = False
-            return self.status
 
         self.dte_signal_temp.emit(
             DataToExport(
@@ -121,10 +119,8 @@ class DAQ_0DViewer_Keithley2100(DAQ_Viewer_base):
             )
         )
 
-        self.status.initialized = True
-        self.status.controller = self.controller
-
-        return self.status
+        
+        return initialized, info
 
     def close(self):
         """Terminate the communication protocol"""
