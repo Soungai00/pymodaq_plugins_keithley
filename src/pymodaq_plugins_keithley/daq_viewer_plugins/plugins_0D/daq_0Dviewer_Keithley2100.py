@@ -1,16 +1,10 @@
 import numpy as np
 from pymodaq.utils.daq_utils import ThreadCommand
 from pymodaq.utils.data import DataFromPlugins, DataToExport
-from pymodaq.control_modules.viewer_utility_classes import (
-    DAQ_Viewer_base,
-    comon_parameters,
-    main,
-)
+from pymodaq.control_modules.viewer_utility_classes import (DAQ_Viewer_base, comon_parameters,main,)
 from pymodaq.utils.parameter import Parameter
 from pymodaq_plugins_keithley import config
-from pymodaq_plugins_keithley.hardware.keithley2100.keithley2100_VISADriver import (
-    Keithley2100VISADriver as Keithley,
-)
+from pymodaq_plugins_keithley.hardware.keithley2100.keithley2100_VISADriver import (Keithley2100VISADriver as Keithley,)
 from pymodaq.utils.logger import set_logger, get_module_name
 
 logger = set_logger(get_module_name(__file__))
