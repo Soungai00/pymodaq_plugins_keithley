@@ -4,20 +4,19 @@ from pymodaq_plugins_keithley import config
 from pymodaq.utils.logger import set_logger, get_module_name
 logger = set_logger(get_module_name(__file__))
 
-
+print("In keithley2100_VISADriver.py")
 class Keithley2100VISADriver:
     """VISA class driver for the Keithley 2100 Multimeter/Switch System
 
     This class relies on pyvisa module to communicate with the instrument via VISA protocol.
     Please refer to the instrument reference manual available at:
-    https://PLACEHOLDER.pdf
-    https://PLACEHOLDER.pdf
+    https://www.tek.com/en/manual/keithley-model-2100-6-1-2-digit-resolution-digital-multimeter-calibration-manual
     """
     # List the Keithley instruments the user has configured from the .toml configuration file
     list_instruments = {}
-    for instr in config["Keithley", "2100"].keys():
-        if "INSTRUMENT" in instr:
-            list_instruments[instr] = config["Keithley", "2100", instr, "rsrc_name"]
+    # for instr in config["Keithley", "2100"].keys():
+    #     if "INSTRUMENT" in instr:
+    #         list_instruments[instr] = config["Keithley", "2100", instr, "rsrc_name"]
     logger.info("Configured instruments: {}".format(list(list_instruments.items())))
 
     def __init__(self, rsrc_name):
@@ -46,7 +45,7 @@ class Keithley2100VISADriver:
                                            read_termination="\n",
                                            )
             self._instr.timeout = 10000
-            # Check if the selected resource match the loaded configuration
+
             model = self.get_idn()[32:36]
             if "21" not in model:
                 logger.warning("Driver designed to use Keithley 2100, not {} model. Problems may occur.".format(model))
