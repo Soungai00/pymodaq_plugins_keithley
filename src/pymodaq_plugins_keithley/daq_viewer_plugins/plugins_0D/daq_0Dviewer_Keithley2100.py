@@ -6,6 +6,7 @@ from pymodaq.utils.parameter import Parameter
 from pymodaq_plugins_keithley import config
 from pymodaq_plugins_keithley.hardware.keithley2100.keithley2100_VISADriver import (Keithley2100VISADriver as Keithley,)
 from pymodaq.utils.logger import set_logger, get_module_name
+import pyvisa
 
 logger = set_logger(get_module_name(__file__))
 
@@ -68,9 +69,10 @@ class DAQ_0DViewer_Keithley2100(DAQ_Viewer_base):
         """Attributes init when DAQ_0DViewer_Keithley class is instanced"""
         self.controller: Keithley = None
         self.channels_in_selected_mode = None
-        self.rsrc_name = None
+        self.rsrc_name = self.settings.child("resources").value()
+        #self._instr = None
         self.panel = None
-        self.instr = None
+        #self.instr = None
 
     def commit_settings(self, param):
         """Apply the consequences of a change of value in the detector settings
@@ -97,11 +99,21 @@ class DAQ_0DViewer_Keithley2100(DAQ_Viewer_base):
         logger.info("Detector 0D initialized")
 
         if self.is_master:
-            self.controller = Keithley(self.rsrc_name)
-            initialized = self.controller.init_hardware()
-            info = txt = self.controller.get_idn()
-            self.settings.child("K2100Params", "ID").setValue(txt)
-            self.controller.set_mode(self.settings.child("K2100Params", "mode").value())
+            try: 
+                rm = pyvisa.ResourceManager()
+                self._instr = rm.open_resource(self.rsrc_name)
+                self.controller = Keithley(self.rsrc_name)
+                if self.controller._instr is not None:
+                    txt = self.controller.get_idn()
+                    self.settings.child("K2100Params", "ID").setValue(txt)
+                else:
+                    logger.warning("No controller found")
+            except Exception as e:
+                logger.exception(str(e))
+            # initialized = self.controller.init_hardware()
+            # txt = self.controller.get_idn()
+            # self.settings.child("K2100Params", "ID").setValue(txt)
+            # self.controller.set_mode(self.settings.child("K2100Params", "mode").value())
         else:
             logger.warning("No controller found")
 
@@ -120,7 +132,7 @@ class DAQ_0DViewer_Keithley2100(DAQ_Viewer_base):
         )
 
         
-        return initialized, info
+        return "Keithley 2100 initialized" + self.controller.get_idn()
 
     def close(self):
         """Terminate the communication protocol"""
