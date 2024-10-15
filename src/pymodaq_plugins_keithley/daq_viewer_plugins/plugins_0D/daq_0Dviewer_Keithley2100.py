@@ -69,7 +69,7 @@ class DAQ_0DViewer_Keithley2100(DAQ_Viewer_base):
         """Attributes init when DAQ_0DViewer_Keithley class is instanced"""
         self.controller: Keithley = None
         self.channels_in_selected_mode = None
-        self.rsrc_name = self.settings.child("resources").value()
+        self.rsrc_name = None 
         #self._instr = None
         self.panel = None
         #self.instr = None
@@ -104,6 +104,7 @@ class DAQ_0DViewer_Keithley2100(DAQ_Viewer_base):
                 self._instr = rm.open_resource(self.rsrc_name)
                 self.controller = Keithley(self.rsrc_name)
                 if self.controller._instr is not None:
+                    self.controller.init_hardware()
                     txt = self.controller.get_idn()
                     self.settings.child("K2100Params", "ID").setValue(txt)
                 else:
