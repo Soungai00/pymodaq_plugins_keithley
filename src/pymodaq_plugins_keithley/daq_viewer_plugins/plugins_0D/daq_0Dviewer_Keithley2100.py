@@ -42,8 +42,7 @@ class DAQ_0DViewer_Keithley2100(DAQ_Viewer_base):
             "title": "Resources",
             "name": "resources",
             "type": "list",
-            "limits": resources_list,
-            "value": resources_list[0],
+            "limits": rsrc_name,    
         },
         {
             "title": "Keithley2100 Parameters",
