@@ -130,9 +130,10 @@ class DAQ_0DViewer_Keithley2100(DAQ_Viewer_base):
                 ],
             )
         )
-
-        
-        return "Keithley 2100 initialized" + self.controller.get_idn()
+        info = logger.info("Keithley2100 initialized")
+        initialized = True
+        return initialized, info
+       
 
     def close(self):
         """Terminate the communication protocol"""
