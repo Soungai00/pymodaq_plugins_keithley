@@ -76,7 +76,7 @@ class DAQ_0DViewer_Keithley2100(DAQ_Viewer_base):
         self.panel = None
         #self.instr = None
 
-    def commit_settings(self, param):
+    def commit_settings(self, param: Parameter):
         """Apply the consequences of a change of value in the detector settings
 
         Parameters
@@ -107,46 +107,7 @@ class DAQ_0DViewer_Keithley2100(DAQ_Viewer_base):
             print("initialized Keithley!")
             txt = self.controller.get_idn()
             self.settings.child("K2100Params", "ID").setValue(txt)
-            logger.info("Keithley2100 is actually working for once")
-        #     # try: 
-        #         # rm = pyvisa.ResourceManager()
-        #         # self._instr = rm.open_resource(self.rsrc_name)
-
-        #     self.controller = Keithley(self.rsrc_name)
-        #     if self.controller is not None:
-        #         self.controller.init_hardware()
-        #         logger.info("controller works")
-        #         self.controller.get_idn()
-        #         logger.info("yay something at least works")
-        #         self.settings.child("K2100Params", "ID").setValue(self.controller.get_idn())
-        #         logger.info("This is working")
-
-        #     else:
-        #         initialized = False
-        #         raise Exception("No controller found - 1st try")
-                
-        #     # except Exception as e:
-        #     #     logger.exception(str(e))
-        #     # initialized = self.controller.init_hardware()
-        #     # txt = self.controller.get_idn()
-        #     # self.settings.child("K2100Params", "ID").setValue(txt)
-        #     # self.controller.set_mode(self.settings.child("K2100Params", "mode").value())
-        # else:
-        #     logger.warning("No controller found - else")
-
-        # self.dte_signal_temp.emit(
-        #     DataToExport(
-        #         name="K2100",
-        #         data=[
-        #             DataFromPlugins(
-        #                 name="K2100_1",
-        #                 data=[np.array([0]), np.array([0])],
-        #                 dim="Data0D",
-        #                 Labels=["time", "voltage"],
-        #             )
-        #         ],
-        #     )
-        # )
+         
         info = "Keithley2100 initialized"
         initialized = True
         return info, initialized
