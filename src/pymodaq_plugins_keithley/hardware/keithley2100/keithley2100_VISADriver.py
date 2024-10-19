@@ -30,33 +30,38 @@ class Keithley2100VISADriver:
         self.instr = ""
         self.configured_modules = {}
 
-    def init_hardware(self, pyvisa_backend='@ivi'):
+    def init_hardware(self):
         """Initialize the selected VISA resource
         
         :param pyvisa_backend: Expects a pyvisa backend identifier or a path to the visa backend dll (ref. to pyvisa)
         :type pyvisa_backend: string
         """
         # Open connexion with instrument
-        rm = visa.highlevel.ResourceManager(pyvisa_backend)
-        logger.info("Resources detected by pyvisa: {}".format(rm.list_resources(query='?*')))
-        try:
-            self._instr = rm.open_resource(self.rsrc_name,
+        print(f"self.rsrc_name = {self.rsrc_name} in hardware code")
+        rm = visa.highlevel.ResourceManager()
+        self._instr = rm.open_resource(self.rsrc_name,
                                            write_termination="\n",
-                                           read_termination="\n",
-                                           )
-            self._instr.timeout = 10000
+                                        #    read_termination="\n",
+                                           )        # logger.info("Resources detected by pyvisa: {}".format(rm.list_resources(query='?*')))
+        # try:
+        #     self._instr = rm.open_resource(self.rsrc_name,
+        #                                    write_termination="\n",
+        #                                 #    read_termination="\n",
+        #                                    )
+        #     self._instr.timeout = 10000
 
-            model = self.get_idn()[32:36]
-            if "21" not in model:
-                logger.warning("Driver designed to use Keithley 2100, not {} model. Problems may occur.".format(model))
-            for instr in config["Keithley", "2100"]:
-                if type(config["Keithley", "2100", instr]) == dict:
-                    if self.rsrc_name in config["Keithley", "2100", instr, "rsrc_name"]:
-                        self.instr = instr
-            logger.info("Instrument selected: {} ".format(config["Keithley", "2100", self.instr, "rsrc_name"]))
-            logger.info("Keithley model : {}".format(config["Keithley", "2100", self.instr, "model_name"]))
-        except visa.errors.VisaIOError as err:
-            logger.error(err)
+        #     model = self.get_idn()[32:36]
+        #     if "21" not in model:
+        #         logger.warning("Driver designed to use Keithley 2100, not {} model. Problems may occur.".format(model))
+        #     for instr in config["Keithley", "2100"]:
+        #         if type(config["Keithley", "2100", instr]) == dict:
+        #             if self.rsrc_name in config["Keithley", "2100", instr, "rsrc_name"]:
+        #                 self.instr = instr
+        #     logger.info("Instrument selected: {} ".format(config["Keithley", "2100", self.instr, "rsrc_name"]))
+        #     logger.info("Keithley model : {}".format(config["Keithley", "2100", self.instr, "model_name"]))
+        # except visa.errors.VisaIOError as err:
+        #     logger.error(err)
+
 
     def clear_buffer(self):
         # Default: auto clear when scan start
@@ -220,9 +225,9 @@ class Keithley2100VISADriver:
 
         self._instr.write(cmd)
 
-    def stop_acquisition(self):
-        # If scan in process, stop it
-        self._instr.write("ROUT:SCAN:LSEL NONE")
+    # def stop_acquisition(self):
+    #     # If scan in process, stop it
+    #     self._instr.write("ROUT:SCAN:LSEL NONE")
 
     def user_command(self):
         command = input('Enter here a command you want to send directly to the Keithley [if None, press enter]: ')

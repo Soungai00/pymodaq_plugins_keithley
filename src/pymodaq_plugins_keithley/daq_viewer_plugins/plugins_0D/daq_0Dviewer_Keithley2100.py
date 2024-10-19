@@ -36,12 +36,15 @@ class DAQ_0DViewer_Keithley2100(DAQ_Viewer_base):
         if "INSTRUMENT" in instr:
             resources_list += [config["Keithley", "2100", instr, "rsrc_name"]]
     logger.info("resources list = {}".format(resources_list))
+    print(f"resources_list= {resources_list}")
+    rsrc_name = resources_list[0]
+    print(f"rsrc_name = {rsrc_name}")
 
     params = comon_parameters + [
         {
             "title": "Resources",
             "name": "resources",
-            "type": "list",
+            "type": "str",
             "limits": rsrc_name,    
         },
         {
@@ -54,7 +57,7 @@ class DAQ_0DViewer_Keithley2100(DAQ_Viewer_base):
                     "title": "Mode",
                     "name": "mode",
                     "type": "list",
-                    "limits": ["VDC", "VAC", "R2W", "R4W"],
+                    "limits": ["VDC", "VAC", "R2W", "R4W", "IDC", "IAC"], 
                     "value": "VDC",
                 },
             ],
@@ -68,7 +71,7 @@ class DAQ_0DViewer_Keithley2100(DAQ_Viewer_base):
         """Attributes init when DAQ_0DViewer_Keithley class is instanced"""
         self.controller: Keithley = None
         self.channels_in_selected_mode = None
-        self.rsrc_name = None 
+        # self.rsrc_name = None 
         #self._instr = None
         self.panel = None
         #self.instr = None
@@ -86,6 +89,7 @@ class DAQ_0DViewer_Keithley2100(DAQ_Viewer_base):
             self.controller.set_mode()
             logger.info("mode changed to {}".format(param.value()))
 
+
     def ini_detector(self, controller=None):
         """Detector communication initialization
 
@@ -95,44 +99,57 @@ class DAQ_0DViewer_Keithley2100(DAQ_Viewer_base):
         :return: Initialization status, false if it failed otherwise True
         :rtype: bool
         """
-        logger.info("Detector 0D initialized")
-
+           
         if self.is_master:
-            try: 
-                rm = pyvisa.ResourceManager()
-                self._instr = rm.open_resource(self.rsrc_name)
-                self.controller = Keithley(self.rsrc_name)
-                if self.controller._instr is not None:
-                    self.controller.init_hardware()
-                    txt = self.controller.get_idn()
-                    self.settings.child("K2100Params", "ID").setValue(txt)
-                else:
-                    logger.warning("No controller found")
-            except Exception as e:
-                logger.exception(str(e))
-            # initialized = self.controller.init_hardware()
-            # txt = self.controller.get_idn()
-            # self.settings.child("K2100Params", "ID").setValue(txt)
-            # self.controller.set_mode(self.settings.child("K2100Params", "mode").value())
-        else:
-            logger.warning("No controller found")
+            print(f"self.rsrc_name = {self.rsrc_name} in 0dviewer")
+            self.controller = Keithley(self.rsrc_name)
+            self.controller.init_hardware()
+            print("initialized Keithley!")
+            txt = self.controller.get_idn()
+            self.settings.child("K2100Params", "ID").setValue(txt)
+            logger.info("Keithley2100 is actually working for once")
+        #     # try: 
+        #         # rm = pyvisa.ResourceManager()
+        #         # self._instr = rm.open_resource(self.rsrc_name)
 
-        self.dte_signal_temp.emit(
-            DataToExport(
-                name="K2100",
-                data=[
-                    DataFromPlugins(
-                        name="K2100_1",
-                        data=[np.array([0]), np.array([0])],
-                        dim="Data0D",
-                        Labels=["time", "voltage"],
-                    )
-                ],
-            )
-        )
-        info = logger.info("Keithley2100 initialized")
+        #     self.controller = Keithley(self.rsrc_name)
+        #     if self.controller is not None:
+        #         self.controller.init_hardware()
+        #         logger.info("controller works")
+        #         self.controller.get_idn()
+        #         logger.info("yay something at least works")
+        #         self.settings.child("K2100Params", "ID").setValue(self.controller.get_idn())
+        #         logger.info("This is working")
+
+        #     else:
+        #         initialized = False
+        #         raise Exception("No controller found - 1st try")
+                
+        #     # except Exception as e:
+        #     #     logger.exception(str(e))
+        #     # initialized = self.controller.init_hardware()
+        #     # txt = self.controller.get_idn()
+        #     # self.settings.child("K2100Params", "ID").setValue(txt)
+        #     # self.controller.set_mode(self.settings.child("K2100Params", "mode").value())
+        # else:
+        #     logger.warning("No controller found - else")
+
+        # self.dte_signal_temp.emit(
+        #     DataToExport(
+        #         name="K2100",
+        #         data=[
+        #             DataFromPlugins(
+        #                 name="K2100_1",
+        #                 data=[np.array([0]), np.array([0])],
+        #                 dim="Data0D",
+        #                 Labels=["time", "voltage"],
+        #             )
+        #         ],
+        #     )
+        # )
+        info = "Keithley2100 initialized"
         initialized = True
-        return initialized, info
+        return info, initialized
        
 
     def close(self):
@@ -153,6 +170,7 @@ class DAQ_0DViewer_Keithley2100(DAQ_Viewer_base):
         =============== ======== ===============================================
 
         """
+        logger.info("grab_data called")
         data = self.controller.read()
         dte = DataToExport(
             name="K2100",
@@ -166,9 +184,12 @@ class DAQ_0DViewer_Keithley2100(DAQ_Viewer_base):
         self.dte_signal.emit(dte)
 
     def stop(self):
+        # """Stop the current grab hardware wise if necessary"""
+        # self.emit_status(ThreadCommand("Update_Status", ["Acquisition stopped"]))
+        # return ""
         """Stop the current grab hardware wise if necessary"""
-        self.emit_status(ThreadCommand("Update_Status", ["Acquisition stopped"]))
-        return ""
+        ## TODO for your custom plugin
+        raise NotImplemented  # when writing your own plugin remove this line    
 
 
 if __name__ == "__main__":
