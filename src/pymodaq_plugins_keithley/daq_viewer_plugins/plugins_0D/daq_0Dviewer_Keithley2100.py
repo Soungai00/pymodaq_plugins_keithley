@@ -117,19 +117,6 @@ class DAQ_0DViewer_Keithley2100(DAQ_Viewer_base):
         else:
             logger.warning("No controller found")
 
-        self.dte_signal_temp.emit(
-            DataToExport(
-                name="K2100",
-                data=[
-                    DataFromPlugins(
-                        name="K2100_1",
-                        data=[np.array([0]), np.array([0])],
-                        dim="Data0D",
-                        Labels=["time", "voltage"],
-                    )
-                ],
-            )
-        )
         info = logger.info("Keithley2100 initialized")
         initialized = True
         return initialized, info
