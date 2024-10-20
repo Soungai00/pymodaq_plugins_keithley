@@ -36,9 +36,7 @@ class DAQ_0DViewer_Keithley2100(DAQ_Viewer_base):
         if "INSTRUMENT" in instr:
             resources_list += [config["Keithley", "2100", instr, "rsrc_name"]]
     logger.info("resources list = {}".format(resources_list))
-    print(f"resources_list= {resources_list}")
     rsrc_name = resources_list[0]
-    print(f"rsrc_name = {rsrc_name}")
 
     params = comon_parameters + [
         {
@@ -98,10 +96,8 @@ class DAQ_0DViewer_Keithley2100(DAQ_Viewer_base):
         """
            
         if self.is_master:
-            print(f"self.rsrc_name = {self.rsrc_name} in 0dviewer")
             self.controller = Keithley(self.rsrc_name)
             self.controller.init_hardware()
-            print("initialized Keithley!")
             txt = self.controller.get_idn()
             self.settings.child("K2100Params", "ID").setValue(txt)
          

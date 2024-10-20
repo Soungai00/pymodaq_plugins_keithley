@@ -14,9 +14,6 @@ class Keithley2100VISADriver:
     """
     # List the Keithley instruments the user has configured from the .toml configuration file
     list_instruments = {}
-    # for instr in config["Keithley", "2100"].keys():
-    #     if "INSTRUMENT" in instr:
-    #         list_instruments[instr] = config["Keithley", "2100", instr, "rsrc_name"]
     logger.info("Configured instruments: {}".format(list(list_instruments.items())))
 
     def __init__(self, rsrc_name):
