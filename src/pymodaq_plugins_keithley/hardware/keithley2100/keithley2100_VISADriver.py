@@ -1,10 +1,9 @@
 import numpy as np
 import pyvisa as visa
-from pymodaq_plugins_keithley import config
 from pymodaq.utils.logger import set_logger, get_module_name
 logger = set_logger(get_module_name(__file__))
 
-print("In keithley2100_VISADriver.py")
+
 class Keithley2100VISADriver:
     """VISA class driver for the Keithley 2100 Multimeter/Switch System
 
@@ -56,71 +55,6 @@ class Keithley2100VISADriver:
     def close(self):
         self._instr.write("ROUT:OPEN:ALL")
         self._instr.close()
-
-    def data(self):
-        # """Get data from instrument
-        # """
-        # return float(self._instr.query(":READ?"))
-
-        # FIXME: this was just restored from daq_0Dviewer_Keithley27xx.py. If this does now work, use return float(self._instr.query(":READ?")) as above.
-        """Get data from instrument
-
-        Make the Keithley perform 3 actions: init, trigger, fetch. Then process the answer to return 3 variables:
-        - The answer (string)
-        - The measurement values (numpy array)
-        - The timestamp of each measurement (numpy array)
-        """
-        if not self.sample_count_1:
-            # Initiate scan
-            self._instr.write("INIT")
-            # Trigger scan
-            self._instr.write("*TRG")
-            # Get data (equivalent to TRAC:DATA? from buffer)
-            str_answer = self._instr.query("FETCH?")
-        else:
-            str_answer = self._instr.query("FETCH?")
-        # Split the instrument answer (MEASUREMENT,TIME,READING COUNT) to create a list
-        list_split_answer = str_answer.split(",")
-
-        # MEASUREMENT & TIME EXTRACTION
-        list_measurements = list_split_answer[::3]
-        str_measurements = ''
-        list_times = list_split_answer[1::3]
-        str_times = ''
-        for j in range(len(list_measurements)):
-            if not j == 0:
-                str_measurements += ','
-                str_times += ','
-            for l1 in range(len(list_measurements[j])):
-                test_carac = list_measurements[j][-(l1+1)]
-                # Remove non-digit characters (units)
-                if test_carac.isdigit():
-                    if l1 == 0:
-                        str_measurements += list_measurements[j]
-                    else:
-                        str_measurements += list_measurements[j][:-l1]
-                    break
-            for l2 in range(len(list_times[j])):
-                test_carac = list_times[j][-(l2+1)]
-                # Remove non-digit characters (units)
-                if test_carac.isdigit():
-                    if l2 == 0:
-                        str_times += list_times[j]
-                    else:
-                        str_times += list_times[j][:-l2]
-                    break
-
-        # Split created string to access each value
-        list_measurements_values = str_measurements.split(",")
-        list_times_values = str_times.split(",")
-        # Create numpy.array containing desired values (float type)
-        array_measurements_values = np.array(list_measurements_values, dtype=float)
-        if not self.sample_count_1:
-            array_times_values = np.array(list_times_values, dtype=float)
-        else:
-            array_times_values = np.array([0], dtype=float)
-
-        return str_answer, array_measurements_values, array_times_values
 
     def get_card(self):
         # Query switching module
@@ -216,44 +150,4 @@ class Keithley2100VISADriver:
 
 
 if __name__ == "__main__":
-    try:
-        print("In main")
-
-        # You can use this main section for:
-        # - Testing connexion and communication with your instrument
-        # - Testing new methods in developer mode
-
-        RM = visa.ResourceManager("@ivi")
-        print("list resources", RM.list_resources())
-
-        # K2100 Instance of KeithleyVISADriver class (replace ASRL1::INSTR by the name of your resource)
-        k2100 = Keithley2100VISADriver("ASRL1::INSTR")
-        k2100.init_hardware()
-        print("IDN?")
-        print(k2100.get_idn())
-        k2100.reset()
-
-        # Daq_viewer simulation first run
-        k2100.set_mode(str(input('Enter which mode you want to scan \
-        [scan_scan_list, scan_volt:dc, scan_r2w, scan_temp...]:')))
-        print('Manual scan example of command set to send directly: >init >*trg >trac:data?')
-        k2100.user_command()
-        print('Automatic scan example with 2 iterations')
-        for i in range(2):
-            print(k2100.data())
-        print(k2100.data())
-
-        # Daq_viewer simulation change mode
-        k2100.set_mode(str(input('Enter which mode you want to scan \
-        [scan_scan_list, scan_volt:dc, scan_r2w, scan_temp...]:')))
-        for i in range(2):
-            print(k2100.data())
-        print(k2100.data())
-
-        k2100.clear_buffer()
-        k2100.close()
-
-        print("Out")
-
-    except Exception as e:
-        print("Exception ({}): {}".format(type(e), str(e)))
+    print("Keithley2100VISADriver module executed as script.")
