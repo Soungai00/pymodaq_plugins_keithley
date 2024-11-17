@@ -1,4 +1,4 @@
-import numpy as np
+import numpy as np # DK - delete because it is not used.
 import pyvisa as visa
 from pymodaq.utils.logger import set_logger, get_module_name
 logger = set_logger(get_module_name(__file__))
@@ -23,8 +23,8 @@ class Keithley2100VISADriver:
         """
         self._instr = None
         self.rsrc_name = rsrc_name
-        self.instr = ""
-        self.configured_modules = {}
+        self.instr = "" # DK - delete because it is not used
+        self.configured_modules = {} # DK - delete because it is not used
 
     def init_hardware(self):
         """Initialize the selected VISA resource
@@ -33,7 +33,7 @@ class Keithley2100VISADriver:
         :type pyvisa_backend: string
         """
         # Open connexion with instrument
-        print(f"self.rsrc_name = {self.rsrc_name} in hardware code")
+        print(f"self.rsrc_name = {self.rsrc_name} in hardware code") # DK - replace with logger.debug
         rm = visa.highlevel.ResourceManager()
         self._instr = rm.open_resource(self.rsrc_name,
                                            write_termination="\n",
@@ -141,7 +141,7 @@ class Keithley2100VISADriver:
         command = input('Enter here a command you want to send directly to the Keithley [if None, press enter]: ')
         if command != '':
             if command[-1] == "?":
-                print(self._instr.query(command))
+                print(self._instr.query(command)) # DK - replace with logger.debug
             else:
                 self._instr.write(command)
             self.user_command()
@@ -150,4 +150,5 @@ class Keithley2100VISADriver:
 
 
 if __name__ == "__main__":
-    print("Keithley2100VISADriver module executed as script.")
+    print("Keithley2100VISADriver module executed as script.") # DK - Delete
+    # DK - add main(__file__) to follow the 0DViewer template

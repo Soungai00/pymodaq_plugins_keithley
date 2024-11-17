@@ -29,7 +29,8 @@ class DAQ_0DViewer_Keithley2100(DAQ_Viewer_base):
     :type params: dictionary list
     """
 
-    # Read configuration file
+    # Read configuration file # DK - I prefer not to have this because this makes initialization of daq_viewer slow.
+
     for instr in config["Keithley", "2100"].keys():
         if "INSTRUMENT" in instr:
             resources_list += [config["Keithley", "2100", instr, "rsrc_name"]]
@@ -41,7 +42,7 @@ class DAQ_0DViewer_Keithley2100(DAQ_Viewer_base):
             "title": "Resources",
             "name": "resources",
             "type": "str",
-            "limits": rsrc_name,    
+            "limits": rsrc_name,    # Delete limits. Add "value": "VISA_PLACEHOLDER"
         },
         {
             "title": "Keithley2100 Parameters",
@@ -92,13 +93,16 @@ class DAQ_0DViewer_Keithley2100(DAQ_Viewer_base):
         :return: Initialization status, false if it failed otherwise True
         :rtype: bool
         """
+
+        # DK Add self.ini_stage_init(slave_controller=controller) to follow the template
            
         if self.is_master:
             self.controller = Keithley(self.rsrc_name)
             self.controller.init_hardware()
             txt = self.controller.get_idn()
             self.settings.child("K2100Params", "ID").setValue(txt)
-         
+
+        # DK - Add "if txt:, elif: ..." for the better logic
         info = "Keithley2100 initialized"
         initialized = True
         return info, initialized
@@ -127,7 +131,7 @@ class DAQ_0DViewer_Keithley2100(DAQ_Viewer_base):
         dte = DataToExport(
             name="K2100",
             data=[
-                DataFromPlugins(
+                DataFromPlugins(# DK - labels="..." which should be str, not list
                     name="K2100", data=data, dim="Data0D", labels=["dat0", "data1"]
                 )
             ],
