@@ -2,8 +2,8 @@ from pymodaq.utils.daq_utils import ThreadCommand
 from pymodaq.utils.data import DataFromPlugins, DataToExport
 from pymodaq.control_modules.viewer_utility_classes import (DAQ_Viewer_base, comon_parameters,main,)
 from pymodaq.utils.parameter import Parameter
-from pymodaq_plugins_keithley import config
-from pymodaq_plugins_keithley.hardware.keithley2100.keithley2100_VISADriver import (Keithley2100VISADriver as Keithley,)
+from pymodaq_plugins_keithley import config # DK - Delete. Not used.
+from pymodaq_plugins_keithley.hardware.keithley2100.keithley2100_VISADriver import (Keithley2100VISADriver as Keithley,) # Delete "(" and ",)"
 from pymodaq.utils.logger import set_logger, get_module_name
 
 logger = set_logger(get_module_name(__file__))
@@ -11,8 +11,8 @@ logger = set_logger(get_module_name(__file__))
 
 rsrc_name: str
 instr: str
-panel: str
-channels_in_selected_mode: str
+panel: str  # Delete. The hardware code does not have this feature.
+channels_in_selected_mode: str # Delete. The hardware code does not have this feature.
 resources_list = []
 
 
@@ -29,8 +29,9 @@ class DAQ_0DViewer_Keithley2100(DAQ_Viewer_base):
     :type params: dictionary list
     """
 
-    # Read configuration file # DK - I prefer not to have this because this makes initialization of daq_viewer slow.
-
+    # DK - I prefer not to have this because this makes initialization of daq_viewer slow.
+    # DK - accordingly, delete "resources_list = []" before the class
+    # Read configuration file
     for instr in config["Keithley", "2100"].keys():
         if "INSTRUMENT" in instr:
             resources_list += [config["Keithley", "2100", instr, "rsrc_name"]]
@@ -67,8 +68,8 @@ class DAQ_0DViewer_Keithley2100(DAQ_Viewer_base):
     def ini_attributes(self):
         """Attributes init when DAQ_0DViewer_Keithley class is instanced"""
         self.controller: Keithley = None
-        self.channels_in_selected_mode = None
-        self.panel = None
+        self.channels_in_selected_mode = None  # Delete. The hardware code does not have this feature.
+        self.panel = None  # Delete. The hardware code does not have this feature.
 
     def commit_settings(self, param: Parameter):
         """Apply the consequences of a change of value in the detector settings
