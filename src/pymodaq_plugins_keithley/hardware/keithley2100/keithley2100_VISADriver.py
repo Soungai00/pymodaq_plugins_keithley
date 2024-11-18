@@ -10,9 +10,6 @@ class Keithley2100VISADriver:
     Please refer to the instrument reference manual available at:
     https://www.tek.com/en/manual/keithley-model-2100-6-1-2-digit-resolution-digital-multimeter-calibration-manual
     """
-    list_instruments = {}
-    logger.info("Configured instruments: {}".format(list(list_instruments.items())))
-
     def __init__(self, rsrc_name):
         """Initialize KeithleyVISADriver class
 
@@ -28,7 +25,6 @@ class Keithley2100VISADriver:
         :param pyvisa_backend: Expects a pyvisa backend identifier or a path to the visa backend dll (ref. to pyvisa)
         :type pyvisa_backend: string
         """
-        print(f"self.rsrc_name = {self.rsrc_name} in hardware code")
         rm = visa.highlevel.ResourceManager()
         self._instr = rm.open_resource(self.rsrc_name,
                                            write_termination="\n",
