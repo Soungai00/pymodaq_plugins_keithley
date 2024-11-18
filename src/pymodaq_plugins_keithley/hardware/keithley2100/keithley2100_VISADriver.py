@@ -132,6 +132,3 @@ class Keithley2100VISADriver:
             self.user_command()
         else:
             pass
-
-
-if __name__ == "__main__":
