@@ -1,4 +1,3 @@
-import numpy as np # DK - delete because it is not used.
 import pyvisa as visa
 from pymodaq.utils.logger import set_logger, get_module_name
 logger = set_logger(get_module_name(__file__))
@@ -11,7 +10,6 @@ class Keithley2100VISADriver:
     Please refer to the instrument reference manual available at:
     https://www.tek.com/en/manual/keithley-model-2100-6-1-2-digit-resolution-digital-multimeter-calibration-manual
     """
-    # List the Keithley instruments the user has configured from the .toml configuration file
     list_instruments = {}
     logger.info("Configured instruments: {}".format(list(list_instruments.items())))
 
