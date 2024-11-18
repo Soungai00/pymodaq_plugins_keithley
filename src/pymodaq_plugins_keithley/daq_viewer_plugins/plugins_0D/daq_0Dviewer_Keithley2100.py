@@ -2,7 +2,7 @@ from pymodaq.utils.daq_utils import ThreadCommand
 from pymodaq.utils.data import DataFromPlugins, DataToExport
 from pymodaq.control_modules.viewer_utility_classes import (DAQ_Viewer_base, comon_parameters,main,)
 from pymodaq.utils.parameter import Parameter
-from pymodaq_plugins_keithley.hardware.keithley2100.keithley2100_VISADriver import (Keithley2100VISADriver as Keithley,) # Delete "(" and ",)"
+from pymodaq_plugins_keithley.hardware.keithley2100.keithley2100_VISADriver import Keithley2100VISADriver as Keithley
 from pymodaq.utils.logger import set_logger, get_module_name
 
 logger = set_logger(get_module_name(__file__))
@@ -31,7 +31,7 @@ class DAQ_0DViewer_Keithley2100(DAQ_Viewer_base):
             "title": "Resources",
             "name": "resources",
             "type": "str",
-            "value": rsrc_name,    # Delete limits. Add "value": "VISA_PLACEHOLDER"
+            "value": rsrc_name, 
         },
         {
             "title": "Keithley2100 Parameters",
@@ -89,7 +89,6 @@ class DAQ_0DViewer_Keithley2100(DAQ_Viewer_base):
             txt = self.controller.get_idn()
             self.settings.child("K2100Params", "ID").setValue(txt)
 
-        # DK - Add "if txt:, elif: ..." for the better logic
         info = "Keithley2100 initialized"
         initialized = True
         return info, initialized
