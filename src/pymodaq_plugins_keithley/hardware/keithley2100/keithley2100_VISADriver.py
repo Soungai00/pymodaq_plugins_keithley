@@ -23,8 +23,6 @@ class Keithley2100VISADriver:
         """
         self._instr = None
         self.rsrc_name = rsrc_name
-        self.instr = "" # DK - delete because it is not used
-        self.configured_modules = {} # DK - delete because it is not used
 
     def init_hardware(self):
         """Initialize the selected VISA resource
@@ -32,8 +30,7 @@ class Keithley2100VISADriver:
         :param pyvisa_backend: Expects a pyvisa backend identifier or a path to the visa backend dll (ref. to pyvisa)
         :type pyvisa_backend: string
         """
-        # Open connexion with instrument
-        print(f"self.rsrc_name = {self.rsrc_name} in hardware code") # DK - replace with logger.debug
+        print(f"self.rsrc_name = {self.rsrc_name} in hardware code")
         rm = visa.highlevel.ResourceManager()
         self._instr = rm.open_resource(self.rsrc_name,
                                            write_termination="\n",
@@ -41,15 +38,12 @@ class Keithley2100VISADriver:
        
 
     def clear_buffer(self):
-        # Default: auto clear when scan start
         self._instr.write("TRAC:CLE")
 
     def clear_buffer_off(self):
-        # Disable buffer auto clear
         self._instr.write("TRAC:CLE:AUTO OFF")
 
     def clear_buffer_on(self):
-        # Disable buffer auto clear
         self._instr.write("TRAC:CLE:AUTO ON")
 
     def close(self):
@@ -57,23 +51,18 @@ class Keithley2100VISADriver:
         self._instr.close()
 
     def get_card(self):
-        # Query switching module
         return self._instr.query("*OPT?")
     
     def get_error(self):
-        # Ask the keithley to return the last current error
         return self._instr.query("SYST:ERR?")
     
     def get_idn(self):
-        # Query identification
         return self._instr.query("*IDN?")
     
     def init_cont_off(self):
-        # Disable continuous initiation
         self._instr.write("INIT:CONT OFF")
         
     def init_cont_on(self):
-        # Enable continuous initiation
         self._instr.write("INIT:CONT ON")
 
     def mode_temp_frtd(self, channel, transducer, frtd_type,):
@@ -90,9 +79,7 @@ class Keithley2100VISADriver:
         self._instr.write("TEMP:THER:TYPE " + ther_type + "," + channel)
     
     def reset(self):
-        # Clear measurement event register
         self._instr.write("*CLS")
-        # One-shot measurement mode (Equivalent to INIT:COUNT OFF)
         self._instr.write("*RST")
 
     def read(self):
@@ -141,7 +128,7 @@ class Keithley2100VISADriver:
         command = input('Enter here a command you want to send directly to the Keithley [if None, press enter]: ')
         if command != '':
             if command[-1] == "?":
-                print(self._instr.query(command)) # DK - replace with logger.debug
+                logger.info(self._instr.query(command)) 
             else:
                 self._instr.write(command)
             self.user_command()
@@ -150,5 +137,3 @@ class Keithley2100VISADriver:
 
 
 if __name__ == "__main__":
-    print("Keithley2100VISADriver module executed as script.") # DK - Delete
-    # DK - add main(__file__) to follow the 0DViewer template
