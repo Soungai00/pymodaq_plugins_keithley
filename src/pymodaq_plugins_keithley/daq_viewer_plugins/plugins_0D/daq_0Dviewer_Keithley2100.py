@@ -114,7 +114,7 @@ class DAQ_0DViewer_Keithley2100(DAQ_Viewer_base):
         dte = DataToExport(
             name="K2100",
             data=[
-                DataFromPlugins(name="K2100", data=data, dim="Data0D", labels=["Voltage"])
+                DataFromPlugins(name="K2100", data=data, dim="Keithley0D", labels=["Amplitude"])
             ],
         )
 
