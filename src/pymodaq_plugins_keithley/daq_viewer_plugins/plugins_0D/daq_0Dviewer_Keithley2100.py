@@ -8,10 +8,8 @@ from pymodaq.utils.logger import set_logger, get_module_name
 logger = set_logger(get_module_name(__file__))
 
 
-rsrc_name: str
-instr: str
-
-
+# rsrc_name: str
+# instr: str
 
 class DAQ_0DViewer_Keithley2100(DAQ_Viewer_base):
     """Keithley plugin class for a OD viewer.
@@ -31,7 +29,7 @@ class DAQ_0DViewer_Keithley2100(DAQ_Viewer_base):
             "title": "Resources",
             "name": "resources",
             "type": "str",
-            "value": rsrc_name, 
+            "value": "PLACE_HOLDER", #TODO: replace by the actual VISA resource name
         },
         {
             "title": "Keithley2100 Parameters",
@@ -112,12 +110,11 @@ class DAQ_0DViewer_Keithley2100(DAQ_Viewer_base):
         =============== ======== ===============================================
 
         """
-        logger.info("grab_data called")
         data = self.controller.read()
         dte = DataToExport(
             name="K2100",
             data=[
-                DataFromPlugins(name="K2100", data=data, dim="Data0D", labels=["dat0", "data1"])
+                DataFromPlugins(name="K2100", data=data, dim="Data0D", labels=["Voltage"])
             ],
         )
 
@@ -125,7 +122,7 @@ class DAQ_0DViewer_Keithley2100(DAQ_Viewer_base):
 
     def stop(self):
         """Stop the current grab hardware wise if necessary"""
-        raise NotImplemented   
+        return ""   
 
 
 if __name__ == "__main__":
