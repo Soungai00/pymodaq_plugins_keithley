@@ -8,9 +8,6 @@ from pymodaq.utils.logger import set_logger, get_module_name
 logger = set_logger(get_module_name(__file__))
 
 
-# rsrc_name: str
-# instr: str
-
 class DAQ_0DViewer_Keithley2100(DAQ_Viewer_base):
     """Keithley plugin class for a OD viewer.
 
