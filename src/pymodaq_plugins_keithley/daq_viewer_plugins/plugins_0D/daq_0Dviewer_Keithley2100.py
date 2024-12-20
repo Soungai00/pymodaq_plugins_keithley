@@ -29,7 +29,7 @@ class DAQ_0DViewer_Keithley2100(DAQ_Viewer_base):
             "title": "Resources",
             "name": "resources",
             "type": "str",
-            "value": "PLACE_HOLDER", #TODO: replace by the actual VISA resource name
+            "value": "USB0::0x05E6::0x2100::1149087::INSTR",
         },
         {
             "title": "Keithley2100 Parameters",
@@ -65,7 +65,7 @@ class DAQ_0DViewer_Keithley2100(DAQ_Viewer_base):
         """
 
         if param.name() == "mode":
-            self.controller.set_mode()
+            self.controller.set_mode(param.value())
             logger.info("mode changed to {}".format(param.value()))
 
 
@@ -79,10 +79,10 @@ class DAQ_0DViewer_Keithley2100(DAQ_Viewer_base):
         :rtype: bool
         """
 
-        self.ini_stage_init(slave_controller=controller)
+        self.ini_detector_init(slave_controller=controller)
 
         if self.is_master:
-            self.controller = Keithley(self.rsrc_name)
+            self.controller = Keithley(self.settings["resources"])
             self.controller.init_hardware()
             txt = self.controller.get_idn()
             self.settings.child("K2100Params", "ID").setValue(txt)
@@ -114,7 +114,7 @@ class DAQ_0DViewer_Keithley2100(DAQ_Viewer_base):
         dte = DataToExport(
             name="K2100",
             data=[
-                DataFromPlugins(name="K2100", data=data, dim="Keithley0D", labels=["Amplitude"])
+                DataFromPlugins(name="K2100", data=data, dim="Data0D", labels=["Amplitude"])
             ],
         )
 
