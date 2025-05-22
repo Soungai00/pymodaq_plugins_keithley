@@ -273,6 +273,22 @@ class Keithley27XXVISADriver:
 
         return str_answer, array_measurements_values, array_times_values
 
+    def get_card(self):
+        # Query switching module
+        raise NotImplementedError
+
+    def get_data(self):
+        # Make a measurement
+        raise NotImplementedError
+
+    def get_error(self):
+        # Ask the keithley to return the last current error
+        raise NotImplementedError
+
+    def get_idn(self):
+        # Query identification
+        raise NotImplementedError
+
     def init_cont_off(self):
         # Disable continuous initiation
         self._instr.write("INIT:CONT OFF")

@@ -26,6 +26,7 @@ class Keithley2700VISADriver(Keithley27XXVISADriver):
         return self._instr.query("*OPT?")[1:-1]
 
     def get_data(self):
+        # Make a measurement
         return self._instr.query("FETCH?")[1:-1]
 
     def get_error(self):
