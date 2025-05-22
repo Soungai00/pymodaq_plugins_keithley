@@ -87,11 +87,6 @@ class DAQ_0DViewer_Keithley27XX(DAQ_Viewer_base):
             if self.controller.non_amp_module["MODULE02"] and not self.controller.non_amp_module["MODULE01"]:
                 logger.info("Both modules don't support current measurement")
 
-    def close(self):
-        """Terminate the communication protocol"""
-        self.controller.close()
-        logger.info("communication ended successfully")
-
     def grab_data(self, Naverage=1, **kwargs):
         """Start a grab from the detector
 
@@ -151,6 +146,10 @@ class DAQ_0DViewer_Keithley27XX(DAQ_Viewer_base):
         self.emit_status(ThreadCommand('Update_Status', ['Acquisition stopped']))
         return ''
 
+    def close(self):
+        """Terminate the communication protocol"""
+        self.controller.close()
+        logger.info("communication ended successfully")
 
 if __name__ == '__main__':
     main(__file__)
