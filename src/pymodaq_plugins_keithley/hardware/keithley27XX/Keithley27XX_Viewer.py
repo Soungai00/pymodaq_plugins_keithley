@@ -52,6 +52,47 @@ class DAQ_0DViewer_Keithley27XX(DAQ_Viewer_base):
         self.panel = None
         self.instr = None
 
+    def ini_detector(self, controller=None):
+        """Detector communication initialization
+
+        :param controller: Custom object of a PyMoDAQ plugin (Slave case). None if one actuator/detector by controller.
+        :type controller: object
+
+        :return: Initialization status, false if it failed otherwise True
+        :rtype: bool
+        """
+        logger.info("Detector 0D initialized")
+
+        self.instantiate_controller()
+        # Keithley initialization & identification
+        self.controller.init_hardware()
+        txt = self.controller.get_idn()
+        self.settings.child('Keithley_Params', 'ID').setValue(txt)
+
+        # Initialize detector communication and set the default value (SCAN_LIST)
+        if self.panel == 'FRONT':
+            self.settings.child('Keithley_Params', 'rearpanel').visible = False
+            value = self.settings.child('Keithley_Params', 'frontpanel', 'frontmode').value()
+            self.controller.current_mode = value
+            self.controller.set_mode(value)
+        elif self.panel == 'REAR':
+            self.settings.child('Keithley_Params', 'frontpanel').visible = False
+            self.settings.child('Keithley_Params', 'frontpanel').value = 'REAR'
+            self.controller.configuration_sequence()
+            value = 'SCAN_' + self.settings.child('Keithley_Params', 'rearpanel', 'rearmode').value()
+            self.channels_in_selected_mode = self.controller.set_mode(value)
+            logger.info("Channels to plot : {}".format(self.channels_in_selected_mode))
+        logger.info("DAQ_viewer command sent to keithley visa driver : {}".format(value))
+
+        self.status.initialized = True
+        self.status.controller = self.controller
+
+        return self.status
+
+    def instantiate_controller(self):
+        """Check the configuration and instantiate the controller according to the selected resource"""
+        raise NotImplementedError
+
     def commit_settings(self, param: Parameter):
         """Apply the consequences of a change of value in the detector settings"""
         if param.name() == 'panel':

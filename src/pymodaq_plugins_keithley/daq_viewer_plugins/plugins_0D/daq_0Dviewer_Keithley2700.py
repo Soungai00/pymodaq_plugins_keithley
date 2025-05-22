@@ -28,18 +28,9 @@ class DAQ_0DViewer_Keithley2700(DAQ_0DViewer_Keithley27XX):
     def __init__(self, parent=None, params_state=None):
         super().__init__(parent, params_state)
 
-    def ini_detector(self, controller=None):
-        """Detector communication initialization
-
-        :param controller: Custom object of a PyMoDAQ plugin (Slave case). None if one actuator/detector by controller.
-        :type controller: object
-
-        :return: Initialization status, false if it failed otherwise True
-        :rtype: bool
-        """
-        logger.info("Detector 0D initialized")
-
-        if self.settings.child('controller_status').value() == "Slave":
+    def instantiate_controller(self):
+        """Check the configuration and instantiate the controller according to the selected resource"""
+        if not self.is_master:
             if controller is None:
                 raise Exception('no controller has been defined externally while this detector is a slave one')
             else:
@@ -62,28 +53,3 @@ class DAQ_0DViewer_Keithley2700(DAQ_0DViewer_Keithley27XX):
             except Exception as e:
                 raise Exception('No controller could be defined because an error occurred \
                 while connecting to the instrument. Error: {}'.format(str(e)))
-
-        # Keithley initialization & identification
-        self.controller.init_hardware()
-        txt = self.controller.get_idn()
-        self.settings.child('Keithley_Params', 'ID').setValue(txt)
-
-        # Initialize detector communication and set the default value (SCAN_LIST)
-        if self.panel == 'FRONT':
-            self.settings.child('Keithley_Params', 'rearpanel').visible = False
-            value = self.settings.child('Keithley_Params', 'frontpanel', 'frontmode').value()
-            self.controller.current_mode = value
-            self.controller.set_mode(value)
-        elif self.panel == 'REAR':
-            self.settings.child('Keithley_Params', 'frontpanel').visible = False
-            self.settings.child('Keithley_Params', 'frontpanel').value = 'REAR'
-            self.controller.configuration_sequence()
-            value = 'SCAN_' + self.settings.child('Keithley_Params', 'rearpanel', 'rearmode').value()
-            self.channels_in_selected_mode = self.controller.set_mode(value)
-            logger.info("Channels to plot : {}".format(self.channels_in_selected_mode))
-        logger.info("DAQ_viewer command sent to keithley visa driver : {}".format(value))
-
-        self.status.initialized = True
-        self.status.controller = self.controller
-
-        return self.status
