@@ -9,11 +9,13 @@ class Keithley27XXVISADriver:
     """VISA base class driver for Keithley 2700-2701-2750 drivers
     """
 
-    # Non-amps modules
+    # Modules specifications
     non_amp_module = {"MODULE01": False, "MODULE02": False}
     non_amp_modules_list = ['7701', '7703', '7706', '7707', '7708', '7709']
+    automatic_cjc_modules_list = ['7700', '7706', '7708']
 
     # Channels & modes attributes
+    model = ''
     channels_scan_list = ''
     modes_channels_dict = {'VOLT:DC': [],
                            'VOLT:AC': [],
@@ -103,6 +105,8 @@ class Keithley27XXVISADriver:
                 logger.error(AttributeError)
         except visa.errors.VisaIOError as err:
             logger.error(err)
+        except Exception:
+            logger.error(Exception)
 
     def configuration_sequence(self):
         """Configure each channel selected by the user
@@ -162,17 +166,17 @@ class Keithley27XXVISADriver:
                     self._instr.write(mode + ':NPLC ' + str(nplc))
 
                 if "TEMP" in mode:
-                    transducer = config["Keithley", self.model, self.instr, module, 'CHANNELS', key, "transducer"].upper()
-                    if "TC" in transducer:
+                    trans = config["Keithley", self.model, self.instr, module, 'CHANNELS', key, "transducer"].upper()
+                    if "TC" in trans:
                         tc_type = config["Keithley", self.model, self.instr, module, 'CHANNELS', key, "type"].upper()
-                        ref_junc = config["Keithley", self.model, self.instr, module, 'CHANNELS', key, "ref_junc"].upper()
-                        self.mode_temp_tc(channel, transducer, tc_type, ref_junc)
-                    elif "THER" in transducer:
+                        ref_j = config["Keithley", self.model, self.instr, module, 'CHANNELS', key, "ref_junc"].upper()
+                        self.mode_temp_tc(module, channel, trans, tc_type, ref_j)
+                    elif "THER" in trans:
                         ther_type = config["Keithley", self.model, self.instr, module, 'CHANNELS', key, "type"].upper()
-                        self.mode_temp_ther(channel, transducer, ther_type)
-                    elif "FRTD" in transducer:
+                        self.mode_temp_ther(channel, trans, ther_type)
+                    elif "FRTD" in trans:
                         frtd_type = config["Keithley", self.model, self.instr, module, 'CHANNELS', key, "type"].upper()
-                        self.mode_temp_frtd(channel, transducer, frtd_type)
+                        self.mode_temp_frtd(channel, trans, frtd_type)
 
                 # Console info
                 logger.info("Channels {} \n {}"
@@ -301,10 +305,13 @@ class Keithley27XXVISADriver:
         self._instr.write("TEMP:TRAN " + transducer + "," + channel)
         self._instr.write("TEMP:FRTD:TYPE " + frtd_type + "," + channel)
 
-    def mode_temp_tc(self, channel, transducer, tc_type, ref_junc,):
+    def mode_temp_tc(self, module, channel, transducer, tc_type, ref_junc,):
         self._instr.write("TEMP:TRAN " + transducer + "," + channel)
         self._instr.write("TEMP:TC:TYPE " + tc_type + "," + channel)
         self._instr.write("TEMP:RJUN:RSEL " + ref_junc + "," + channel)
+        if self.get_error() != '0,"No error"':
+            logger.error("Modules {} only have automatic cjc, not {}"
+                         .format(self.automatic_cjc_modules_list, self.configured_modules[module]))
 
     def mode_temp_ther(self, channel, transducer, ther_type,):
         self._instr.write("TEMP:TRAN " + transducer + "," + channel)
