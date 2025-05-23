@@ -61,7 +61,7 @@ class DAQ_0DViewer_Keithley27XX(DAQ_Viewer_base):
         :return: Initialization status, false if it failed otherwise True
         :rtype: bool
         """
-        logger.info("Detector 0D initialized")
+        logger.info("Detector 0D initializing")
 
         self.instantiate_controller()
         # Keithley initialization & identification
@@ -191,6 +191,7 @@ class DAQ_0DViewer_Keithley27XX(DAQ_Viewer_base):
         """Terminate the communication protocol"""
         self.controller.close()
         logger.info("communication ended successfully")
+
 
 if __name__ == '__main__':
     main(__file__)

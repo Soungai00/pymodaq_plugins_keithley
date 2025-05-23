@@ -14,10 +14,10 @@ panel = "rear"
 termination_character = "Keithley must be set to LF"
 
 [Keithley.2700.INSTRUMENT01.MODULE01]
-module_name = ""
+module_name = "NONE"
 
 [Keithley.2700.INSTRUMENT01.MODULE02]
-module_name = ""
+module_name = "NONE"
 
 [Keithley.2700.INSTRUMENT01.MODULE01.CHANNELS]
 
@@ -38,10 +38,10 @@ panel = "rear"
 termination_character = "Keithley must be set to LF"
 
 [Keithley.2701.INSTRUMENT01.MODULE01]
-module_name = ""
+module_name = "NONE"
 
 [Keithley.2701.INSTRUMENT01.MODULE02]
-module_name = ""
+module_name = "NONE"
 
 [Keithley.2701.INSTRUMENT01.MODULE01.CHANNELS]
 
@@ -62,10 +62,10 @@ panel = "rear"
 termination_character = "Keithley must be set to LF"
 
 [Keithley.2750.INSTRUMENT01.MODULE01]
-module_name = ""
+module_name = "NONE"
 
 [Keithley.2750.INSTRUMENT01.MODULE02]
-module_name = ""
+module_name = "NONE"
 
 [Keithley.2750.INSTRUMENT01.MODULE01.CHANNELS]
 

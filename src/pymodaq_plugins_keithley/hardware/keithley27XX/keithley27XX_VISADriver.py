@@ -175,8 +175,8 @@ class Keithley27XXVISADriver:
                         self.mode_temp_frtd(channel, transducer, frtd_type)
 
                 # Console info
-                logger.info("Channels {} \n {}".format(key,
-                                                       config["Keithley", self.model, self.instr, module, 'CHANNELS', key]))
+                logger.info("Channels {} \n {}"
+                            .format(key, config["Keithley", self.model, self.instr, module, 'CHANNELS', key]))
                 # Timeout update for long measurement modes such as voltage AC
                 if "AC" in mode:
                     self._instr.timeout += 4000
