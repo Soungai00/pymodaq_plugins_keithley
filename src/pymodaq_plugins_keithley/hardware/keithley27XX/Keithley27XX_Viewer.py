@@ -63,7 +63,7 @@ class DAQ_0DViewer_Keithley27XX(DAQ_Viewer_base):
         """
         logger.info("Detector 0D initializing")
 
-        self.instantiate_controller()
+        self.instantiate_controller(controller)
         # Keithley initialization & identification
         self.controller.init_hardware()
         txt = self.controller.get_idn()
@@ -89,7 +89,7 @@ class DAQ_0DViewer_Keithley27XX(DAQ_Viewer_base):
 
         return self.status
 
-    def instantiate_controller(self):
+    def instantiate_controller(self, controller):
         """Check the configuration and instantiate the controller according to the selected resource"""
         raise NotImplementedError
 

@@ -28,7 +28,7 @@ class DAQ_0DViewer_Keithley2701(DAQ_0DViewer_Keithley27XX):
     def __init__(self, parent=None, params_state=None):
         super().__init__(parent, params_state)
 
-    def instantiate_controller(self):
+    def instantiate_controller(self, controller):
         """Check the configuration and instantiate the controller according to the selected resource"""
         if not self.is_master:
             if controller is None:
