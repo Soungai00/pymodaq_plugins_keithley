@@ -2,6 +2,10 @@ title = "this is the configuration file of the Keithley plugin"
 
 [Keithley]
 
+[Keithley.2601A]
+IP = ""
+port = ""
+
 [Keithley.2700]
 title = "Configuration entry for a Keithley 2700 Multimeter/Switch System"
 
