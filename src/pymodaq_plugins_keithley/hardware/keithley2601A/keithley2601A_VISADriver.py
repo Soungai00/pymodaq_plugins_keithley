@@ -20,6 +20,8 @@ class Keithley2601AVISADriver:
         self.port = ""
         self.visa_addr = ""
         self._instr = None
+        rm = visa.highlevel.ResourceManager('@py')
+        logger.info("Resources detected by pyvisa: {}".format(rm.list_resources(query='?*')))
 
     def init_hardware(self, instr):
         """Initialize the selected resource"""
@@ -28,7 +30,6 @@ class Keithley2601AVISADriver:
         self.visa_addr = f"TCPIP::{self.ip_addr}::{self.port}::SOCKET"
         # Open connexion with instrument
         rm = visa.highlevel.ResourceManager('@py')
-        logger.info("Resources detected by pyvisa: {}".format(rm.list_resources(query='?*')))
         try:
             self._instr = rm.open_resource(self.visa_addr,
                                            write_termination="\n",
