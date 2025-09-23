@@ -217,7 +217,9 @@ class DAQ_Move_Keithley2601A(DAQ_Move_base):
 
     def close(self):
         """End communication with instrument"""
-        self.controller.close()
+        if self.is_master:
+            self.controller.close()
+            logger.info("communication ended successfully")
 
 if __name__ == '__main__':
     main(__file__)

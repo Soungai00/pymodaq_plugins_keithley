@@ -112,9 +112,9 @@ class DAQ_0DViewer_Keithley2601A(DAQ_Viewer_base):
 
     def close(self):
         """Terminate the communication protocol"""
-        self.controller.reset()
-        self.controller.close()
-        logger.info("communication ended successfully")
+        if self.is_master:
+            self.controller.close()
+            logger.info("communication ended successfully")
 
 
 if __name__ == '__main__':
