@@ -119,10 +119,8 @@ class DAQ_Move_Keithley2601A(DAQ_Move_base):
                 self.settings.child('voltage_mode').show(param.value() != 'Current')
                 if param.value() == 'Current':
                     self.controller.source_current = 0
-                    self.controller.measure_voltage()
                 else:
                     self.controller.source_voltage = 0.
-                    self.controller.measure_current()
 
         elif param.name() == 'enabled':
             self.enable_source(param.value())
