@@ -2,7 +2,7 @@ title = "this is the configuration file of the Keithley plugin"
 
 [Keithley]
 
-[Keithley.2601A]
+[Keithley.2601A.INSTRUMENT01]
 IP = ""
 port = ""
 
