@@ -1,3 +1,5 @@
+import time
+
 import numpy as np
 import pyvisa as visa
 from pymodaq_plugins_keithley import config
@@ -132,7 +134,9 @@ class Keithley2601AVISADriver:
         self._instr.write("waitcomplete()")
 
     def close(self):
+        self.modify_voltage(0)
         self.disable_source()
+        time.sleep(1) # Ensure source is disabled before closing communication
         self._instr.close()
 
     def check_errors(self):
