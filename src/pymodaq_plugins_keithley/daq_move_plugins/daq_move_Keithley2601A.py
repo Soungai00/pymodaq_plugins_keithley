@@ -127,7 +127,7 @@ class DAQ_Move_Keithley2601A(DAQ_Move_base):
         elif param.name() == 'enabled':
             self.enable_source(param.value())
 
-    def check_position(self):
+    def get_actuator_value(self):
         """Get the current position from the hardware with scaling conversion.
 
         Returns
@@ -145,10 +145,11 @@ class DAQ_Move_Keithley2601A(DAQ_Move_base):
                 pos = pos[0]
         else:
             pos = 0.
+        pos = DataActuator(data=pos)
         pos = self.get_position_with_scaling(pos)
         self.current_position = pos
 
-        self.emit_status(ThreadCommand('check_position', [pos]))
+        self.emit_status(ThreadCommand('get_actuator_value', [pos]))
         return pos
 
     @property
@@ -194,11 +195,11 @@ class DAQ_Move_Keithley2601A(DAQ_Move_base):
 
         if self.enabled:
             if self.settings.child('source_mode').value() == 'Current':
-                self.controller.modify_current(position)
+                self.controller.modify_current(position.value())
                 self.controller.wait_complete()
                 pos = self.controller.measure_voltage()
             else:
-                self.controller.modify_voltage(position)
+                self.controller.modify_voltage(position.value())
                 self.controller.wait_complete()
                 pos = self.controller.measure_current()
 
@@ -212,7 +213,7 @@ class DAQ_Move_Keithley2601A(DAQ_Move_base):
         self.move_Abs(self.target_position)
 
     def move_Home(self):
-        self.move_Abs(0)
+        self.move_Abs(DataActuator(data=0))
 
     def stop_motion(self):
         self.move_done()  # to let the interface know the actuator stopped
