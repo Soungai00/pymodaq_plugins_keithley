@@ -99,6 +99,8 @@ class DAQ_Move_Keithley2601A(DAQ_Move_base):
             self.controller.init_hardware(self.instr)
         txt = self.controller.get_idn()
         self.settings.child('ID').setValue(txt)
+        self.settings.child("source_mode").setValue("Voltage")
+        self.enable_source(True)
 
         self.status.initialized = True
         self.status.controller = self.controller
