@@ -23,19 +23,19 @@ class Keithley2700VISADriver(Keithley27XXVISADriver):
 
     def get_card(self):
         # Query switching module
-        return self._instr.query("*OPT?")
+        return self._instr.query("*OPT?")[1:-1]
 
     def get_data(self):
         # Make a measurement
-        return self._instr.query("FETCH?")
+        return self._instr.query("FETCH?")[1:-1]
 
     def get_error(self):
         # Ask the keithley to return the last current error
-        return self._instr.query("SYST:ERR?")
+        return self._instr.query("SYST:ERR?")[1:-1]
 
     def get_idn(self):
         # Query identification
-        return self._instr.query("*IDN?")
+        return self._instr.query("*IDN?")[1:-1]
 
 
 if __name__ == "__main__":
