@@ -20,7 +20,7 @@ class DAQ_0DViewer_Keithley2601A(DAQ_Viewer_base):
     # Read configuration file
     for instr in config["Keithley", model].keys():
         if "INSTRUMENT" in instr:
-            resources_list += [f"TCPIP::{config["Keithley", model, instr, "IP"]}::{config["Keithley", model, instr, "port"]}::SOCKET"]
+            resources_list += [f"TCPIP::{config['Keithley', model, instr, 'IP']}::{config['Keithley', model, instr, 'port']}::SOCKET"]
     logger.info("resources list = {}".format(resources_list))
 
     params = comon_parameters + [
