@@ -58,7 +58,7 @@ class Keithley2601AVISADriver:
             self._instr.write("smua.source.autorangev = smua.AUTORANGE_ON")
 
     def configuration_sequence(self):
-        self._instr.write("*RST")
+        self.reset()
         #self._instr.write("format.data = format.ASCII")
         #self._instr.write("format.asciiprecision = 6")
 
